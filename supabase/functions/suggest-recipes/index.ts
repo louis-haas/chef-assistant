@@ -50,7 +50,6 @@ Ne réponds qu'avec le JSON, sans texte avant ou après.`
           },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.7,
       }),
     });
 
