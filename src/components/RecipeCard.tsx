@@ -53,6 +53,15 @@ export const RecipeCard = ({
     <Card className="h-full flex flex-col">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CardHeader>
+          {showTags && userId && (
+            <div className="mb-3">
+              <RecipeTagSelector
+                recipeId={recipe.id}
+                userId={userId}
+                onTagsChanged={onRecipeUpdated}
+              />
+            </div>
+          )}
           <div className="flex items-start justify-between gap-2">
             <CollapsibleTrigger asChild>
               <button className="flex-1 text-left group">
@@ -123,34 +132,26 @@ export const RecipeCard = ({
         </CardContent>
         </CollapsibleContent>
       </Collapsible>
-      <CardFooter className="flex flex-col gap-2">
-        {showTags && userId && (
-          <RecipeTagSelector
-            recipeId={recipe.id}
-            userId={userId}
-            onTagsChanged={onRecipeUpdated}
-          />
-        )}
-        <div className="flex flex-col sm:flex-row gap-2 w-full">
+      <CardFooter className="flex flex-col gap-2 items-start">
         {isTodo ? (
           <Button
             variant="outline"
             size="sm"
             onClick={() => onRemoveFromTodo?.(recipe.id)}
-            className="w-full sm:flex-1"
+            className="justify-start"
           >
             <ListTodo className="mr-2 h-4 w-4" />
-            <span className="text-xs sm:text-sm">Retirer de la to-do</span>
+            Retirer de la to-do
           </Button>
         ) : (
           <Button
             variant="outline"
             size="sm"
             onClick={() => onAddToTodo(recipe)}
-            className="w-full sm:flex-1"
+            className="justify-start"
           >
             <ListTodo className="mr-2 h-4 w-4" />
-            <span className="text-xs sm:text-sm">Ajouter à la to-do</span>
+            Ajouter à la to-do
           </Button>
         )}
         {isFavorite ? (
@@ -158,23 +159,22 @@ export const RecipeCard = ({
             variant="default"
             size="sm"
             onClick={() => onRemoveFromFavorites?.(recipe.id)}
-            className="w-full sm:flex-1"
+            className="justify-start"
           >
             <Heart className="mr-2 h-4 w-4 fill-current" />
-            <span className="text-xs sm:text-sm">Retirer des favoris</span>
+            Retirer des favoris
           </Button>
         ) : (
           <Button
             variant="default"
             size="sm"
             onClick={() => onAddToFavorites(recipe)}
-            className="w-full sm:flex-1"
+            className="justify-start"
           >
             <Heart className="mr-2 h-4 w-4" />
-            <span className="text-xs sm:text-sm">Ajouter aux favoris</span>
+            Ajouter aux favoris
           </Button>
         )}
-        </div>
       </CardFooter>
     </Card>
   );
