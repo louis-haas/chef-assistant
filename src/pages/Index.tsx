@@ -173,10 +173,15 @@ const Index = () => {
 
   const parseIngredientName = (fullName: string): { quantity: string; name: string } => {
     // Extraire la quantité au début du nom (ex: "1 kg carottes" -> quantité: "1 kg", nom: "carottes")
-    const match = fullName.match(/^([\d.,]+\s*[a-zA-Zàâäéèêëïîôùûüÿç]*)\s+(.+)$/);
+    // Le regex capture : nombre + optionnellement (espace + unité) + espace + nom
+    const match = fullName.match(/^([\d.,]+(?:\s+[a-zA-Zàâäéèêëïîôùûüÿç]+)?)\s+(.+)$/);
     if (match) {
-      return { quantity: match[1].trim(), name: match[2].trim() };
+      const quantity = match[1].trim();
+      const name = match[2].trim();
+      console.log(`Parsing "${fullName}" → quantity: "${quantity}", name: "${name}"`);
+      return { quantity, name };
     }
+    console.log(`No match for "${fullName}"`);
     return { quantity: '', name: fullName.trim() };
   };
 
@@ -243,20 +248,27 @@ const Index = () => {
     const parsed1 = parseQuantity(qty1);
     const parsed2 = parseQuantity(qty2);
     
+    console.log(`Adding quantities: "${qty1}" + "${qty2}"`, { parsed1, parsed2 });
+    
     if (!parsed1) return qty2;
     if (!parsed2) return qty1;
     
     const base1 = convertToBaseUnit(parsed1.value, parsed1.unit);
     const base2 = convertToBaseUnit(parsed2.value, parsed2.unit);
     
+    console.log(`Converted to base units:`, { base1, base2 });
+    
     // Si les unités de base sont différentes, concaténer
     if (base1.unit !== base2.unit) {
+      console.log(`Different units, concatenating`);
       return `${qty1}, ${qty2}`;
     }
     
     // Additionner et formater
     const total = base1.value + base2.value;
-    return formatQuantity(total, base1.unit);
+    const result = formatQuantity(total, base1.unit);
+    console.log(`Total: ${total} ${base1.unit} → formatted: "${result}"`);
+    return result;
   };
 
   const groupIngredients = (items: Ingredient[]): GroupedIngredient[] => {
