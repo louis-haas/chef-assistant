@@ -1,0 +1,4 @@
+project_id = "uiedosftilkbauxcfvdo"
+
+[functions.suggest-recipes]
+verify_jwt = true
