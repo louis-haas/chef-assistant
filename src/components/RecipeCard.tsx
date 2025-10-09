@@ -54,11 +54,7 @@ export const RecipeCard = ({
     <Card className="h-full flex flex-col">
       {showTags && userId && (
         <div className="p-6 pb-3">
-          <RecipeTagSelector
-            recipeId={recipe.id}
-            userId={userId}
-            onTagsChanged={onRecipeUpdated}
-          />
+          <RecipeTagDisplay recipeId={recipe.id} userId={userId} />
         </div>
       )}
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -134,6 +130,14 @@ export const RecipeCard = ({
         </CollapsibleContent>
       </Collapsible>
       <CardFooter className="flex flex-col gap-2 items-stretch">
+        {showTags && userId && (
+          <RecipeTagSelector
+            recipeId={recipe.id}
+            userId={userId}
+            onTagsChanged={onRecipeUpdated}
+            showBadges={false}
+          />
+        )}
         {isTodo ? (
           <Button
             variant="outline"

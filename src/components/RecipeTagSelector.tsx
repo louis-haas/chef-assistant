@@ -21,9 +21,10 @@ interface RecipeTagSelectorProps {
   recipeId: string;
   userId: string;
   onTagsChanged?: () => void;
+  showBadges?: boolean;
 }
 
-export const RecipeTagSelector = ({ recipeId, userId, onTagsChanged }: RecipeTagSelectorProps) => {
+export const RecipeTagSelector = ({ recipeId, userId, onTagsChanged, showBadges = true }: RecipeTagSelectorProps) => {
   const [allTags, setAllTags] = useState<TagType[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -86,7 +87,7 @@ export const RecipeTagSelector = ({ recipeId, userId, onTagsChanged }: RecipeTag
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {selectedTags.map((tag) => (
+      {showBadges && selectedTags.map((tag) => (
         <Badge
           key={tag.id}
           style={{ backgroundColor: tag.color }}
