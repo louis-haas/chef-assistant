@@ -53,15 +53,6 @@ export const RecipeCard = ({
     <Card className="h-full flex flex-col">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CardHeader>
-          {showTags && userId && (
-            <div className="mb-3">
-              <RecipeTagSelector
-                recipeId={recipe.id}
-                userId={userId}
-                onTagsChanged={onRecipeUpdated}
-              />
-            </div>
-          )}
           <div className="flex items-start justify-between gap-2">
             <CollapsibleTrigger asChild>
               <button className="flex-1 text-left group">
@@ -133,6 +124,13 @@ export const RecipeCard = ({
         </CollapsibleContent>
       </Collapsible>
       <CardFooter className="flex flex-col gap-2 items-start">
+        {showTags && userId && (
+          <RecipeTagSelector
+            recipeId={recipe.id}
+            userId={userId}
+            onTagsChanged={onRecipeUpdated}
+          />
+        )}
         {isTodo ? (
           <Button
             variant="outline"
