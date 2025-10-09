@@ -40,10 +40,12 @@ DESCRIPTION: [description courte ou "N/A"]
 INGRÉDIENTS:
 [nom|quantité|unité]
 [nom|quantité|unité]
-INSTRUCTIONS: [instructions complètes]
+INSTRUCTIONS: [instructions complètes avec deux retours à la ligne entre chaque étape]
 TEMPS_PREP: [temps ou "N/A"]
 TEMPS_CUISSON: [temps ou "N/A"]
-PORTIONS: [nombre ou "N/A"]`;
+PORTIONS: [nombre ou "N/A"]
+
+IMPORTANT: Dans les INSTRUCTIONS, séparer chaque étape par deux retours à la ligne pour une meilleure lisibilité.`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',

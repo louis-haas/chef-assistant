@@ -39,7 +39,7 @@ serve(async (req) => {
       "title": "Nom de la recette",
       "description": "Brève description appétissante",
       "ingredients": ["quantité ingrédient 1", "quantité ingrédient 2", "quantité ingrédient 3"],
-      "instructions": "Instructions détaillées étape par étape pour préparer le plat",
+      "instructions": "Étape 1: ...\n\nÉtape 2: ...\n\nÉtape 3: ...",
       "prep_time": "15 min",
       "cook_time": "30 min",
       "servings": 4
@@ -57,6 +57,10 @@ RÈGLES IMPORTANTES pour les ingrédients:
 - Utiliser des noms GÉNÉRIQUES pour les ingrédients (exemple: "huile d'olive" au lieu de "huile d'olive extra vierge", "tomates" au lieu de "tomates cerises")
 - Être précis sur les quantités
 - TOUJOURS utiliser le format avec les pipes |
+
+RÈGLES IMPORTANTES pour les instructions:
+- Séparer chaque étape par DEUX retours à la ligne (\\n\\n) pour une meilleure lisibilité
+- Numéroter les étapes (Étape 1:, Étape 2:, etc.)
 
 Ne réponds qu'avec le JSON, sans texte avant ou après.`
           },
