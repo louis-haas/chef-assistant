@@ -95,26 +95,26 @@ export const RecipeCard = ({
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex gap-2">
+      <CardFooter className="flex flex-col sm:flex-row gap-2">
         {isTodo ? (
           <Button
             variant="outline"
             size="sm"
             onClick={() => onRemoveFromTodo?.(recipe.id)}
-            className="flex-1"
+            className="w-full sm:flex-1"
           >
             <ListTodo className="mr-2 h-4 w-4" />
-            Retirer de la to-do
+            <span className="text-xs sm:text-sm">Retirer de la to-do</span>
           </Button>
         ) : (
           <Button
             variant="outline"
             size="sm"
             onClick={() => onAddToTodo(recipe)}
-            className="flex-1"
+            className="w-full sm:flex-1"
           >
             <ListTodo className="mr-2 h-4 w-4" />
-            Ajouter à la to-do
+            <span className="text-xs sm:text-sm">Ajouter à la to-do</span>
           </Button>
         )}
         {isFavorite ? (
@@ -122,20 +122,20 @@ export const RecipeCard = ({
             variant="default"
             size="sm"
             onClick={() => onRemoveFromFavorites?.(recipe.id)}
-            className="flex-1"
+            className="w-full sm:flex-1"
           >
             <Heart className="mr-2 h-4 w-4 fill-current" />
-            Retirer des favoris
+            <span className="text-xs sm:text-sm">Retirer des favoris</span>
           </Button>
         ) : (
           <Button
             variant="default"
             size="sm"
             onClick={() => onAddToFavorites(recipe)}
-            className="flex-1"
+            className="w-full sm:flex-1"
           >
             <Heart className="mr-2 h-4 w-4" />
-            Ajouter aux favoris
+            <span className="text-xs sm:text-sm">Ajouter aux favoris</span>
           </Button>
         )}
       </CardFooter>

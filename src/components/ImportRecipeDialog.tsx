@@ -144,12 +144,13 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="gap-2">
+        <Button variant="outline" size="sm" className="gap-1 sm:gap-2">
           <Upload className="h-4 w-4" />
-          Importer une recette
+          <span className="hidden sm:inline">Importer une recette</span>
+          <span className="sm:hidden">Importer</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl mx-2 sm:mx-auto">
         <DialogHeader>
           <DialogTitle>Importer une recette</DialogTitle>
           <DialogDescription>

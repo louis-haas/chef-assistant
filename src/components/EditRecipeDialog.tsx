@@ -82,7 +82,7 @@ export const EditRecipeDialog = ({ recipe, onRecipeUpdated }: EditRecipeDialogPr
           <Pencil className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto mx-2 sm:mx-auto">
         <DialogHeader>
           <DialogTitle>Modifier la recette</DialogTitle>
           <DialogDescription>
@@ -111,7 +111,7 @@ export const EditRecipeDialog = ({ recipe, onRecipeUpdated }: EditRecipeDialogPr
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <Label htmlFor="prep_time">Temps de préparation</Label>
               <Input

@@ -336,41 +336,44 @@ const Index = () => {
   return (
     <div className="min-h-screen pb-8">
       <header className="sticky top-0 z-10 bg-background border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <ChefHat className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-bold">{t("appName")}</h1>
+        <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <ChefHat className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
+            <h1 className="text-lg sm:text-2xl font-bold truncate">{t("appName")}</h1>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1 sm:gap-2 flex-shrink-0">
             <LanguageToggle />
             <ImportRecipeDialog onRecipeImported={fetchUserRecipes} />
-            <Button variant="outline" onClick={() => supabase.auth.signOut()}><LogOut className="mr-2 h-4 w-4" />{t("logout")}</Button>
+            <Button variant="outline" size="sm" onClick={() => supabase.auth.signOut()}>
+              <LogOut className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">{t("logout")}</span>
+            </Button>
           </div>
         </div>
       </header>
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid gap-8 md:grid-cols-3">
-          <div className="md:col-span-2 space-y-6">
+      <main className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
+        <div className="grid gap-4 sm:gap-8 lg:grid-cols-3">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             <RecipeSearch onSearch={handleSearch} isLoading={searchLoading} />
             <Tabs defaultValue="suggestions">
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="suggestions">{t("suggestions")}</TabsTrigger>
-                <TabsTrigger value="todo">{t("todo")} ({todoRecipes.length})</TabsTrigger>
-                <TabsTrigger value="favorites">{t("favorites")} ({favoriteRecipes.length})</TabsTrigger>
+                <TabsTrigger value="suggestions" className="text-xs sm:text-sm">{t("suggestions")}</TabsTrigger>
+                <TabsTrigger value="todo" className="text-xs sm:text-sm">{t("todo")} ({todoRecipes.length})</TabsTrigger>
+                <TabsTrigger value="favorites" className="text-xs sm:text-sm">{t("favorites")} ({favoriteRecipes.length})</TabsTrigger>
               </TabsList>
               <TabsContent value="suggestions" className="space-y-4">
-                {suggestedRecipes.length === 0 ? <p className="text-center text-muted-foreground py-8">{t("searchRecipes")}</p> : <div className="grid gap-4 md:grid-cols-2">{suggestedRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} onAddToTodo={handleAddToTodo} onAddToFavorites={handleAddToFavorites} isTodo={todoRecipes.some(r => r.id === recipe.id)} isFavorite={favoriteRecipes.some(r => r.id === recipe.id)} onRecipeUpdated={fetchUserRecipes} />)}</div>}
+                {suggestedRecipes.length === 0 ? <p className="text-center text-muted-foreground py-8">{t("searchRecipes")}</p> : <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">{suggestedRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} onAddToTodo={handleAddToTodo} onAddToFavorites={handleAddToFavorites} isTodo={todoRecipes.some(r => r.id === recipe.id)} isFavorite={favoriteRecipes.some(r => r.id === recipe.id)} onRecipeUpdated={fetchUserRecipes} />)}</div>}
               </TabsContent>
               <TabsContent value="todo" className="space-y-4">
-                {todoRecipes.length === 0 ? <p className="text-center text-muted-foreground py-8">{t("noTodoRecipes")}</p> : <div className="grid gap-4 md:grid-cols-2">{todoRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} onAddToTodo={handleAddToTodo} onAddToFavorites={handleAddToFavorites} isTodo isFavorite={favoriteRecipes.some(r => r.id === recipe.id)} onRemoveFromTodo={handleRemoveFromTodo} onRecipeUpdated={fetchUserRecipes} />)}</div>}
+                {todoRecipes.length === 0 ? <p className="text-center text-muted-foreground py-8">{t("noTodoRecipes")}</p> : <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">{todoRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} onAddToTodo={handleAddToTodo} onAddToFavorites={handleAddToFavorites} isTodo isFavorite={favoriteRecipes.some(r => r.id === recipe.id)} onRemoveFromTodo={handleRemoveFromTodo} onRecipeUpdated={fetchUserRecipes} />)}</div>}
               </TabsContent>
               <TabsContent value="favorites" className="space-y-4">
-                {favoriteRecipes.length === 0 ? <p className="text-center text-muted-foreground py-8">{t("noFavoriteRecipes")}</p> : <div className="grid gap-4 md:grid-cols-2">{favoriteRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} onAddToTodo={handleAddToTodo} onAddToFavorites={handleAddToFavorites} isTodo={todoRecipes.some(r => r.id === recipe.id)} isFavorite onRemoveFromFavorites={handleRemoveFromFavorites} onRecipeUpdated={fetchUserRecipes} />)}</div>}
+                {favoriteRecipes.length === 0 ? <p className="text-center text-muted-foreground py-8">{t("noFavoriteRecipes")}</p> : <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">{favoriteRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} onAddToTodo={handleAddToTodo} onAddToFavorites={handleAddToFavorites} isTodo={todoRecipes.some(r => r.id === recipe.id)} isFavorite onRemoveFromFavorites={handleRemoveFromFavorites} onRecipeUpdated={fetchUserRecipes} />)}</div>}
               </TabsContent>
             </Tabs>
           </div>
-          <div className="md:col-span-1">
-            <IngredientsList 
+          <div className="lg:col-span-1">
+            <IngredientsList
               ingredients={groupedIngredients} 
               onToggle={(id, checked) => {
                 const ingredient = groupedIngredients.find(i => i.id === id);
