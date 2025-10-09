@@ -38,7 +38,7 @@ serve(async (req) => {
     {
       "title": "Nom de la recette",
       "description": "Brève description appétissante",
-      "ingredients": ["ingrédient 1", "ingrédient 2", "ingrédient 3"],
+      "ingredients": ["quantité ingrédient 1", "quantité ingrédient 2", "quantité ingrédient 3"],
       "instructions": "Instructions détaillées étape par étape pour préparer le plat",
       "prep_time": "15 min",
       "cook_time": "30 min",
@@ -46,6 +46,15 @@ serve(async (req) => {
     }
   ]
 }
+
+RÈGLES IMPORTANTES pour les ingrédients:
+- Un ingrédient par ligne uniquement
+- Format: "quantité nom_ingrédient" (exemple: "200g tomates", "2 oignons")
+- NE PAS inclure la façon de couper ou préparer (pas de "émincé", "en dés", "haché")
+- NE PAS inclure la fonction dans la recette (pas de "pour la sauce", "pour la garniture")
+- NE JAMAIS inclure sel et poivre dans la liste
+- Être précis sur les quantités
+
 Ne réponds qu'avec le JSON, sans texte avant ou après.`
           },
           { role: 'user', content: prompt }
