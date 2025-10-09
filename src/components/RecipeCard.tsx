@@ -1,9 +1,15 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, ListTodo, Clock, Users } from "lucide-react";
+import { Heart, ListTodo, Clock, Users, ChevronDown, ChevronUp } from "lucide-react";
 import { EditRecipeDialog } from "@/components/EditRecipeDialog";
 import { RecipeTagSelector } from "@/components/RecipeTagSelector";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 interface Recipe {
   id: string;
@@ -41,42 +47,57 @@ export const RecipeCard = ({
   userId,
   showTags = false,
 }: RecipeCardProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <Card className="h-full flex flex-col">
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <CardTitle className="text-xl">{recipe.title}</CardTitle>
-            {recipe.description && (
-              <CardDescription>{recipe.description}</CardDescription>
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CardHeader>
+          <div className="flex items-start justify-between gap-2">
+            <CollapsibleTrigger asChild>
+              <button className="flex-1 text-left group">
+                <div className="flex items-start gap-2">
+                  <CardTitle className="text-xl flex-1 group-hover:text-primary transition-colors">
+                    {recipe.title}
+                  </CardTitle>
+                  {isOpen ? (
+                    <ChevronUp className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+                  )}
+                </div>
+                {recipe.description && (
+                  <CardDescription className="mt-1">{recipe.description}</CardDescription>
+                )}
+              </button>
+            </CollapsibleTrigger>
+            {onRecipeUpdated && (
+              <EditRecipeDialog recipe={recipe} onRecipeUpdated={onRecipeUpdated} />
             )}
           </div>
-          {onRecipeUpdated && (
-            <EditRecipeDialog recipe={recipe} onRecipeUpdated={onRecipeUpdated} />
-          )}
-        </div>
-        <div className="flex gap-2 flex-wrap mt-2">
-          {recipe.prep_time && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              Préparation: {recipe.prep_time}
-            </Badge>
-          )}
-          {recipe.cook_time && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              Cuisson: {recipe.cook_time}
-            </Badge>
-          )}
-          {recipe.servings && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              <Users className="h-3 w-3" />
-              {recipe.servings} personnes
-            </Badge>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent className="flex-1">
+          <div className="flex gap-2 flex-wrap mt-2">
+            {recipe.prep_time && (
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                Préparation: {recipe.prep_time}
+              </Badge>
+            )}
+            {recipe.cook_time && (
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                Cuisson: {recipe.cook_time}
+              </Badge>
+            )}
+            {recipe.servings && (
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <Users className="h-3 w-3" />
+                {recipe.servings} personnes
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CollapsibleContent>
+          <CardContent className="flex-1">
         <div className="space-y-4">
           <div>
             <h4 className="font-semibold mb-2">Ingrédients:</h4>
@@ -98,8 +119,10 @@ export const RecipeCard = ({
               {recipe.instructions}
             </p>
           </div>
-        </div>
-      </CardContent>
+          </div>
+        </CardContent>
+        </CollapsibleContent>
+      </Collapsible>
       <CardFooter className="flex flex-col gap-2">
         {showTags && userId && (
           <RecipeTagSelector
