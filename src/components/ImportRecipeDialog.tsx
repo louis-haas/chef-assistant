@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Link } from "lucide-react";
+import { Upload, Link, Image } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -16,6 +16,7 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
   const [open, setOpen] = useState(false);
   const [recipeText, setRecipeText] = useState("");
   const [recipeUrl, setRecipeUrl] = useState("");
+  const [recipeImage, setRecipeImage] = useState<string | null>(null);
   const [isImporting, setIsImporting] = useState(false);
   const [activeTab, setActiveTab] = useState("text");
 
@@ -67,15 +68,38 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
     return { title, description, ingredients, instructions, prep_time, cook_time, servings };
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error("Veuillez sélectionner une image");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      setRecipeImage(base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleImport = async () => {
     const isUrlMode = activeTab === "url";
+    const isImageMode = activeTab === "image";
     
     if (isUrlMode && !recipeUrl.trim()) {
       toast.error("Veuillez entrer une URL");
       return;
     }
     
-    if (!isUrlMode && !recipeText.trim()) {
+    if (isImageMode && !recipeImage) {
+      toast.error("Veuillez sélectionner une photo");
+      return;
+    }
+    
+    if (!isUrlMode && !isImageMode && !recipeText.trim()) {
       toast.error("Veuillez coller le texte d'une recette");
       return;
     }
@@ -89,8 +113,17 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
         return;
       }
 
+      let requestBody;
+      if (isImageMode) {
+        requestBody = { recipeImage };
+      } else if (isUrlMode) {
+        requestBody = { recipeUrl };
+      } else {
+        requestBody = { recipeText };
+      }
+
       const { data: functionData, error: functionError } = await supabase.functions.invoke('import-recipe', {
-        body: isUrlMode ? { recipeUrl } : { recipeText }
+        body: requestBody
       });
 
       if (functionError) throw functionError;
@@ -137,6 +170,7 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
       toast.success("Recette importée et ajoutée à votre to-do!");
       setRecipeText("");
       setRecipeUrl("");
+      setRecipeImage(null);
       setOpen(false);
       onRecipeImported();
     } catch (error) {
@@ -164,9 +198,10 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
           </DialogDescription>
         </DialogHeader>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="text">Texte</TabsTrigger>
             <TabsTrigger value="url">URL</TabsTrigger>
+            <TabsTrigger value="image">Photo</TabsTrigger>
           </TabsList>
           <TabsContent value="text" className="space-y-4">
             <Textarea
@@ -202,6 +237,38 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
               className="w-full"
             >
               {isImporting ? "Import en cours..." : "Importer depuis l'URL"}
+            </Button>
+          </TabsContent>
+          <TabsContent value="image" className="space-y-4">
+            <div className="space-y-2">
+              <div className="border-2 border-dashed rounded-lg p-8 text-center">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  id="recipe-image-upload"
+                />
+                <label 
+                  htmlFor="recipe-image-upload" 
+                  className="cursor-pointer flex flex-col items-center gap-2"
+                >
+                  <Image className="h-12 w-12 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">
+                    {recipeImage ? "Image sélectionnée ✓" : "Cliquez pour sélectionner une photo de recette"}
+                  </span>
+                </label>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                L'IA va analyser la photo et extraire automatiquement les informations de la recette.
+              </p>
+            </div>
+            <Button 
+              onClick={handleImport} 
+              disabled={isImporting || !recipeImage}
+              className="w-full"
+            >
+              {isImporting ? "Analyse en cours..." : "Analyser et importer"}
             </Button>
           </TabsContent>
         </Tabs>

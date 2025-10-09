@@ -50,17 +50,23 @@ serve(async (req) => {
   }
 
   try {
-    const { recipeText, recipeUrl } = await req.json();
+    const { recipeText, recipeUrl, recipeImage } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
     let contentToProcess = recipeText;
+    let imageData = null;
 
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
+    // Si une image est fournie
+    if (recipeImage) {
+      console.log('Processing recipe from image');
+      imageData = recipeImage; // base64 image data
+    }
     // Si une URL est fournie, scraper la page
-    if (recipeUrl) {
+    else if (recipeUrl) {
       try {
         console.log('Fetching recipe from URL:', recipeUrl);
         const response = await fetch(recipeUrl);
@@ -84,7 +90,7 @@ serve(async (req) => {
       }
     }
 
-    const systemPrompt = `Tu es un assistant culinaire expert qui extrait les informations d'une recette à partir d'un texte libre ou d'une page web.
+    const systemPrompt = `Tu es un assistant culinaire expert qui extrait les informations d'une recette à partir d'un texte libre, d'une page web ou d'une photo de recette.
 
 RÈGLES IMPORTANTES:
 - Extraire le titre de la recette
@@ -112,6 +118,33 @@ PORTIONS: [nombre ou "N/A"]
 
 IMPORTANT: Dans les INSTRUCTIONS, séparer chaque étape par deux retours à la ligne pour une meilleure lisibilité.`;
 
+    // Construire le message utilisateur en fonction du type d'entrée
+    let userMessage;
+    if (imageData) {
+      // Pour une image, envoyer l'image et demander l'extraction
+      userMessage = {
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: 'Extrais toutes les informations de cette recette visible dans l\'image.'
+          },
+          {
+            type: 'image_url',
+            image_url: {
+              url: imageData
+            }
+          }
+        ]
+      };
+    } else {
+      // Pour du texte ou une URL, envoyer le texte
+      userMessage = {
+        role: 'user',
+        content: contentToProcess
+      };
+    }
+
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -122,7 +155,7 @@ IMPORTANT: Dans les INSTRUCTIONS, séparer chaque étape par deux retours à la 
         model: 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: contentToProcess }
+          userMessage
         ],
       }),
     });
