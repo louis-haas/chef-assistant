@@ -63,6 +63,7 @@ serve(async (req) => {
     // Si une image est fournie
     if (recipeImage) {
       console.log('Processing recipe from image');
+      console.log('Image data length:', recipeImage.length);
       imageData = recipeImage; // base64 image data
     }
     // Si une URL est fournie, scraper la page
@@ -145,7 +146,7 @@ IMPORTANT: Dans les INSTRUCTIONS, séparer chaque étape par deux retours à la 
       };
     }
 
-    console.log('Sending request to AI API with model: google/gemini-2.5-flash');
+    console.log('Sending request to AI API with model: google/gemini-2.5-pro');
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -154,7 +155,7 @@ IMPORTANT: Dans les INSTRUCTIONS, séparer chaque étape par deux retours à la 
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'google/gemini-2.5-pro',
         messages: [
           { role: 'system', content: systemPrompt },
           userMessage
@@ -162,16 +163,21 @@ IMPORTANT: Dans les INSTRUCTIONS, séparer chaque étape par deux retours à la 
       }),
     });
 
+    console.log('AI API response status:', response.status);
+
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('AI API error response:', errorText);
+      
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
+          JSON.stringify({ error: 'Limite de requêtes atteinte. Veuillez réessayer dans quelques instants.' }),
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
       if (response.status === 402) {
         return new Response(
-          JSON.stringify({ error: 'Payment required. Please add credits to your workspace.' }),
+          JSON.stringify({ error: 'Paiement requis. Veuillez ajouter des crédits à votre espace de travail.' }),
           { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -181,7 +187,10 @@ IMPORTANT: Dans les INSTRUCTIONS, séparer chaque étape par deux retours à la 
           { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      throw new Error(`AI API error: ${response.status}`);
+      return new Response(
+        JSON.stringify({ error: `Erreur de l'API AI (${response.status}): ${errorText}` }),
+        { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const data = await response.json();
