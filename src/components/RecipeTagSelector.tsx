@@ -22,9 +22,10 @@ interface RecipeTagSelectorProps {
   userId: string;
   onTagsChanged?: () => void;
   showBadges?: boolean;
+  showButton?: boolean;
 }
 
-export const RecipeTagSelector = ({ recipeId, userId, onTagsChanged, showBadges = true }: RecipeTagSelectorProps) => {
+export const RecipeTagSelector = ({ recipeId, userId, onTagsChanged, showBadges = true, showButton = true }: RecipeTagSelectorProps) => {
   const [allTags, setAllTags] = useState<TagType[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -97,7 +98,8 @@ export const RecipeTagSelector = ({ recipeId, userId, onTagsChanged, showBadges 
         </Badge>
       ))}
       
-      <DropdownMenu>
+      {showButton && (
+        <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" disabled={loading}>
             <Tag className="h-4 w-4 mr-2" />
@@ -128,6 +130,7 @@ export const RecipeTagSelector = ({ recipeId, userId, onTagsChanged, showBadges 
           )}
         </DropdownMenuContent>
       </DropdownMenu>
+      )}
     </div>
   );
 };

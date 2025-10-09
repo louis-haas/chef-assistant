@@ -54,7 +54,13 @@ export const RecipeCard = ({
     <Card className="h-full flex flex-col">
       {showTags && userId && (
         <div className="p-6 pb-3">
-          <RecipeTagDisplay recipeId={recipe.id} userId={userId} />
+          <RecipeTagSelector
+            recipeId={recipe.id}
+            userId={userId}
+            onTagsChanged={onRecipeUpdated}
+            showBadges={true}
+            showButton={false}
+          />
         </div>
       )}
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -136,6 +142,7 @@ export const RecipeCard = ({
             userId={userId}
             onTagsChanged={onRecipeUpdated}
             showBadges={false}
+            showButton={true}
           />
         )}
         {isTodo ? (
