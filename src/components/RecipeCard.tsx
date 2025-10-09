@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, ListTodo, Clock, Users, ChevronDown, ChevronUp } from "lucide-react";
 import { EditRecipeDialog } from "@/components/EditRecipeDialog";
 import { RecipeTagSelector } from "@/components/RecipeTagSelector";
+import { RecipeTagDisplay } from "@/components/RecipeTagDisplay";
 import {
   Collapsible,
   CollapsibleContent,
@@ -53,6 +54,11 @@ export const RecipeCard = ({
     <Card className="h-full flex flex-col">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CardHeader>
+          {showTags && userId && (
+            <div className="mb-3">
+              <RecipeTagDisplay recipeId={recipe.id} userId={userId} />
+            </div>
+          )}
           <div className="flex items-start justify-between gap-2">
             <CollapsibleTrigger asChild>
               <button className="flex-1 text-left group">
