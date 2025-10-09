@@ -173,6 +173,12 @@ IMPORTANT: Dans les INSTRUCTIONS, séparer chaque étape par deux retours à la 
           { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
+      if (response.status === 503) {
+        return new Response(
+          JSON.stringify({ error: 'Le service AI est temporairement indisponible. Veuillez réessayer dans quelques instants.' }),
+          { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
       throw new Error(`AI API error: ${response.status}`);
     }
 

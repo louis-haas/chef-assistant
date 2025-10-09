@@ -126,7 +126,11 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
         body: requestBody
       });
 
-      if (functionError) throw functionError;
+      if (functionError) {
+        const errorMessage = functionData?.error || functionError.message || "Erreur lors de l'import de la recette";
+        toast.error(errorMessage);
+        throw functionError;
+      }
 
       const recipe = parseRecipeResponse(functionData.parsedRecipe);
 
