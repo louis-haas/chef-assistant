@@ -52,13 +52,13 @@ export const RecipeCard = ({
 
   return (
     <Card className="h-full flex flex-col">
-      {showTags && userId && (
-        <div className="p-6 pb-0">
-          <RecipeTagDisplay recipeId={recipe.id} userId={userId} />
-        </div>
-      )}
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CardHeader className={showTags && userId ? "pt-0" : ""}>
+        <CardHeader>
+          {showTags && userId && (
+            <div className="mb-3">
+              <RecipeTagDisplay recipeId={recipe.id} userId={userId} />
+            </div>
+          )}
           <div className="flex items-start justify-between gap-2">
             <CollapsibleTrigger asChild>
               <button className="flex-1 text-left group">
@@ -129,7 +129,7 @@ export const RecipeCard = ({
         </CardContent>
         </CollapsibleContent>
       </Collapsible>
-      <CardFooter className="flex flex-col gap-2 items-start">
+      <CardFooter className="flex flex-col gap-2 items-stretch">
         {showTags && userId && (
           <RecipeTagSelector
             recipeId={recipe.id}
@@ -142,7 +142,7 @@ export const RecipeCard = ({
             variant="outline"
             size="sm"
             onClick={() => onRemoveFromTodo?.(recipe.id)}
-            className="justify-start"
+            className="w-full justify-start"
           >
             <ListTodo className="mr-2 h-4 w-4" />
             Retirer de la to-do
@@ -152,7 +152,7 @@ export const RecipeCard = ({
             variant="outline"
             size="sm"
             onClick={() => onAddToTodo(recipe)}
-            className="justify-start"
+            className="w-full justify-start"
           >
             <ListTodo className="mr-2 h-4 w-4" />
             Ajouter à la to-do
@@ -163,7 +163,7 @@ export const RecipeCard = ({
             variant="default"
             size="sm"
             onClick={() => onRemoveFromFavorites?.(recipe.id)}
-            className="justify-start"
+            className="w-full justify-start"
           >
             <Heart className="mr-2 h-4 w-4 fill-current" />
             Retirer des favoris
@@ -173,7 +173,7 @@ export const RecipeCard = ({
             variant="default"
             size="sm"
             onClick={() => onAddToFavorites(recipe)}
-            className="justify-start"
+            className="w-full justify-start"
           >
             <Heart className="mr-2 h-4 w-4" />
             Ajouter aux favoris
