@@ -5,9 +5,11 @@ import { RecipeSearch } from "@/components/RecipeSearch";
 import { RecipeCard } from "@/components/RecipeCard";
 import { IngredientsList } from "@/components/IngredientsList";
 import { ImportRecipeDialog } from "@/components/ImportRecipeDialog";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { LogOut, ChefHat } from "lucide-react";
 
 interface Recipe {
@@ -49,6 +51,7 @@ const Index = () => {
   const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -125,9 +128,9 @@ const Index = () => {
       if (saveError) throw saveError;
 
       setSuggestedRecipes(savedRecipes || []);
-      toast({ title: "Recettes trouvées!", description: `${savedRecipes?.length || 0} recettes trouvées.` });
+      toast({ title: t("recipesFound"), description: `${savedRecipes?.length || 0} ${t("recipesCount")}` });
     } catch (error: any) {
-      toast({ variant: "destructive", title: "Erreur", description: error.message });
+      toast({ variant: "destructive", title: t("error"), description: error.message });
     } finally {
       setSearchLoading(false);
     }
@@ -150,9 +153,9 @@ const Index = () => {
       await supabase.from("ingredients").insert(ingredientsToAdd);
       await loadTodoRecipes();
       await loadIngredients();
-      toast({ title: "Ajouté!", description: "Recette ajoutée à votre to-do" });
+      toast({ title: t("added"), description: t("addedToTodo") });
     } catch (error: any) {
-      if (error.code === "23505") toast({ variant: "destructive", title: "Déjà ajouté" });
+      if (error.code === "23505") toast({ variant: "destructive", title: t("alreadyAdded") });
     }
   };
 
@@ -160,9 +163,9 @@ const Index = () => {
     try {
       await supabase.from("favorite_recipes").insert({ user_id: session.user.id, recipe_id: recipe.id });
       await loadFavoriteRecipes();
-      toast({ title: "Ajouté aux favoris!" });
+      toast({ title: t("addedToFavorites") });
     } catch (error: any) {
-      if (error.code === "23505") toast({ variant: "destructive", title: "Déjà dans les favoris" });
+      if (error.code === "23505") toast({ variant: "destructive", title: t("alreadyInFavorites") });
     }
   };
 
@@ -171,13 +174,13 @@ const Index = () => {
     await supabase.from("ingredients").delete().eq("user_id", session.user.id).eq("recipe_id", recipeId);
     await loadTodoRecipes();
     await loadIngredients();
-    toast({ title: "Retiré de la to-do" });
+    toast({ title: t("removedFromTodo") });
   };
 
   const handleRemoveFromFavorites = async (recipeId: string) => {
     await supabase.from("favorite_recipes").delete().eq("user_id", session.user.id).eq("recipe_id", recipeId);
     await loadFavoriteRecipes();
-    toast({ title: "Retiré des favoris" });
+    toast({ title: t("removedFromFavorites") });
   };
 
   const handleToggleIngredient = async (id: string, checked: boolean) => {
@@ -336,11 +339,12 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ChefHat className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-bold">Oui Chef!</h1>
+            <h1 className="text-2xl font-bold">{t("appName")}</h1>
           </div>
           <div className="flex gap-2">
+            <LanguageToggle />
             <ImportRecipeDialog onRecipeImported={fetchUserRecipes} />
-            <Button variant="outline" onClick={() => supabase.auth.signOut()}><LogOut className="mr-2 h-4 w-4" />Déconnexion</Button>
+            <Button variant="outline" onClick={() => supabase.auth.signOut()}><LogOut className="mr-2 h-4 w-4" />{t("logout")}</Button>
           </div>
         </div>
       </header>
@@ -350,18 +354,18 @@ const Index = () => {
             <RecipeSearch onSearch={handleSearch} isLoading={searchLoading} />
             <Tabs defaultValue="suggestions">
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
-                <TabsTrigger value="todo">To-Do ({todoRecipes.length})</TabsTrigger>
-                <TabsTrigger value="favorites">Favoris ({favoriteRecipes.length})</TabsTrigger>
+                <TabsTrigger value="suggestions">{t("suggestions")}</TabsTrigger>
+                <TabsTrigger value="todo">{t("todo")} ({todoRecipes.length})</TabsTrigger>
+                <TabsTrigger value="favorites">{t("favorites")} ({favoriteRecipes.length})</TabsTrigger>
               </TabsList>
               <TabsContent value="suggestions" className="space-y-4">
-                {suggestedRecipes.length === 0 ? <p className="text-center text-muted-foreground py-8">Recherchez des recettes!</p> : <div className="grid gap-4 md:grid-cols-2">{suggestedRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} onAddToTodo={handleAddToTodo} onAddToFavorites={handleAddToFavorites} isTodo={todoRecipes.some(r => r.id === recipe.id)} isFavorite={favoriteRecipes.some(r => r.id === recipe.id)} onRecipeUpdated={fetchUserRecipes} />)}</div>}
+                {suggestedRecipes.length === 0 ? <p className="text-center text-muted-foreground py-8">{t("searchRecipes")}</p> : <div className="grid gap-4 md:grid-cols-2">{suggestedRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} onAddToTodo={handleAddToTodo} onAddToFavorites={handleAddToFavorites} isTodo={todoRecipes.some(r => r.id === recipe.id)} isFavorite={favoriteRecipes.some(r => r.id === recipe.id)} onRecipeUpdated={fetchUserRecipes} />)}</div>}
               </TabsContent>
               <TabsContent value="todo" className="space-y-4">
-                {todoRecipes.length === 0 ? <p className="text-center text-muted-foreground py-8">Aucune recette dans votre to-do</p> : <div className="grid gap-4 md:grid-cols-2">{todoRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} onAddToTodo={handleAddToTodo} onAddToFavorites={handleAddToFavorites} isTodo isFavorite={favoriteRecipes.some(r => r.id === recipe.id)} onRemoveFromTodo={handleRemoveFromTodo} onRecipeUpdated={fetchUserRecipes} />)}</div>}
+                {todoRecipes.length === 0 ? <p className="text-center text-muted-foreground py-8">{t("noTodoRecipes")}</p> : <div className="grid gap-4 md:grid-cols-2">{todoRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} onAddToTodo={handleAddToTodo} onAddToFavorites={handleAddToFavorites} isTodo isFavorite={favoriteRecipes.some(r => r.id === recipe.id)} onRemoveFromTodo={handleRemoveFromTodo} onRecipeUpdated={fetchUserRecipes} />)}</div>}
               </TabsContent>
               <TabsContent value="favorites" className="space-y-4">
-                {favoriteRecipes.length === 0 ? <p className="text-center text-muted-foreground py-8">Aucune recette favorite</p> : <div className="grid gap-4 md:grid-cols-2">{favoriteRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} onAddToTodo={handleAddToTodo} onAddToFavorites={handleAddToFavorites} isTodo={todoRecipes.some(r => r.id === recipe.id)} isFavorite onRemoveFromFavorites={handleRemoveFromFavorites} onRecipeUpdated={fetchUserRecipes} />)}</div>}
+                {favoriteRecipes.length === 0 ? <p className="text-center text-muted-foreground py-8">{t("noFavoriteRecipes")}</p> : <div className="grid gap-4 md:grid-cols-2">{favoriteRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} onAddToTodo={handleAddToTodo} onAddToFavorites={handleAddToFavorites} isTodo={todoRecipes.some(r => r.id === recipe.id)} isFavorite onRemoveFromFavorites={handleRemoveFromFavorites} onRecipeUpdated={fetchUserRecipes} />)}</div>}
               </TabsContent>
             </Tabs>
           </div>
