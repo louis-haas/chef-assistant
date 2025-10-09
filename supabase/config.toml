@@ -2,3 +2,6 @@ project_id = "uiedosftilkbauxcfvdo"
 
 [functions.suggest-recipes]
 verify_jwt = true
+
+[functions.import-recipe]
+verify_jwt = true

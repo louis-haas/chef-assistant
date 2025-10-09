@@ -1,0 +1,143 @@
+import { useState } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Upload } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+interface ImportRecipeDialogProps {
+  onRecipeImported: () => void;
+}
+
+export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps) => {
+  const [open, setOpen] = useState(false);
+  const [recipeText, setRecipeText] = useState("");
+  const [isImporting, setIsImporting] = useState(false);
+
+  const parseRecipeResponse = (parsedText: string) => {
+    const lines = parsedText.split('\n');
+    let title = "";
+    let description = "";
+    let ingredients: string[] = [];
+    let instructions = "";
+    let prep_time = null;
+    let cook_time = null;
+    let servings = null;
+
+    let currentSection = "";
+
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      
+      if (trimmedLine.startsWith('TITRE:')) {
+        title = trimmedLine.replace('TITRE:', '').trim();
+      } else if (trimmedLine.startsWith('DESCRIPTION:')) {
+        const desc = trimmedLine.replace('DESCRIPTION:', '').trim();
+        description = desc === 'N/A' ? '' : desc;
+      } else if (trimmedLine === 'INGRÉDIENTS:') {
+        currentSection = 'ingredients';
+      } else if (trimmedLine.startsWith('INSTRUCTIONS:')) {
+        currentSection = 'instructions';
+        instructions = trimmedLine.replace('INSTRUCTIONS:', '').trim();
+      } else if (trimmedLine.startsWith('TEMPS_PREP:')) {
+        const time = trimmedLine.replace('TEMPS_PREP:', '').trim();
+        prep_time = time === 'N/A' ? null : time;
+      } else if (trimmedLine.startsWith('TEMPS_CUISSON:')) {
+        const time = trimmedLine.replace('TEMPS_CUISSON:', '').trim();
+        cook_time = time === 'N/A' ? null : time;
+      } else if (trimmedLine.startsWith('PORTIONS:')) {
+        const portions = trimmedLine.replace('PORTIONS:', '').trim();
+        servings = portions === 'N/A' ? null : parseInt(portions);
+      } else if (currentSection === 'ingredients' && trimmedLine && !trimmedLine.startsWith('INSTRUCTIONS:')) {
+        ingredients.push(trimmedLine);
+      }
+    }
+
+    return { title, description, ingredients, instructions, prep_time, cook_time, servings };
+  };
+
+  const handleImport = async () => {
+    if (!recipeText.trim()) {
+      toast.error("Veuillez coller le texte d'une recette");
+      return;
+    }
+
+    setIsImporting(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Vous devez être connecté pour importer une recette");
+        return;
+      }
+
+      const { data: functionData, error: functionError } = await supabase.functions.invoke('import-recipe', {
+        body: { recipeText }
+      });
+
+      if (functionError) throw functionError;
+
+      const recipe = parseRecipeResponse(functionData.parsedRecipe);
+
+      const { error: insertError } = await supabase
+        .from('recipes')
+        .insert({
+          user_id: user.id,
+          title: recipe.title,
+          description: recipe.description || null,
+          ingredients: recipe.ingredients,
+          instructions: recipe.instructions,
+          prep_time: recipe.prep_time,
+          cook_time: recipe.cook_time,
+          servings: recipe.servings
+        });
+
+      if (insertError) throw insertError;
+
+      toast.success("Recette importée avec succès!");
+      setRecipeText("");
+      setOpen(false);
+      onRecipeImported();
+    } catch (error) {
+      console.error('Error importing recipe:', error);
+      toast.error("Erreur lors de l'import de la recette");
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="gap-2">
+          <Upload className="h-4 w-4" />
+          Importer une recette
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Importer une recette</DialogTitle>
+          <DialogDescription>
+            Collez le texte d'une recette (titre, ingrédients, instructions) et l'IA l'analysera automatiquement.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4">
+          <Textarea
+            placeholder="Collez ici le texte complet de votre recette..."
+            value={recipeText}
+            onChange={(e) => setRecipeText(e.target.value)}
+            className="min-h-[300px]"
+          />
+          <Button 
+            onClick={handleImport} 
+            disabled={isImporting || !recipeText.trim()}
+            className="w-full"
+          >
+            {isImporting ? "Import en cours..." : "Importer la recette"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};

@@ -4,6 +4,7 @@ import { Auth } from "@/components/Auth";
 import { RecipeSearch } from "@/components/RecipeSearch";
 import { RecipeCard } from "@/components/RecipeCard";
 import { IngredientsList } from "@/components/IngredientsList";
+import { ImportRecipeDialog } from "@/components/ImportRecipeDialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
@@ -95,6 +96,12 @@ const Index = () => {
       .eq("user_id", session.user.id)
       .order("created_at", { ascending: true });
     if (!error) setIngredients(data || []);
+  };
+
+  const fetchUserRecipes = async () => {
+    await loadTodoRecipes();
+    await loadFavoriteRecipes();
+    await loadIngredients();
   };
 
   const handleSearch = async (prompt: string) => {
@@ -331,7 +338,10 @@ const Index = () => {
             <ChefHat className="h-6 w-6 text-primary" />
             <h1 className="text-2xl font-bold">Assistant Culinaire</h1>
           </div>
-          <Button variant="outline" onClick={() => supabase.auth.signOut()}><LogOut className="mr-2 h-4 w-4" />Déconnexion</Button>
+          <div className="flex gap-2">
+            <ImportRecipeDialog onRecipeImported={fetchUserRecipes} />
+            <Button variant="outline" onClick={() => supabase.auth.signOut()}><LogOut className="mr-2 h-4 w-4" />Déconnexion</Button>
+          </div>
         </div>
       </header>
       <main className="container mx-auto px-4 py-8">
