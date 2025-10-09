@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart, ListTodo, Clock, Users } from "lucide-react";
+import { EditRecipeDialog } from "@/components/EditRecipeDialog";
 
 interface Recipe {
   id: string;
@@ -22,6 +23,7 @@ interface RecipeCardProps {
   isFavorite?: boolean;
   onRemoveFromTodo?: (recipeId: string) => void;
   onRemoveFromFavorites?: (recipeId: string) => void;
+  onRecipeUpdated?: () => void;
 }
 
 export const RecipeCard = ({
@@ -32,14 +34,22 @@ export const RecipeCard = ({
   isFavorite,
   onRemoveFromTodo,
   onRemoveFromFavorites,
+  onRecipeUpdated,
 }: RecipeCardProps) => {
   return (
     <Card className="h-full flex flex-col">
       <CardHeader>
-        <CardTitle className="text-xl">{recipe.title}</CardTitle>
-        {recipe.description && (
-          <CardDescription>{recipe.description}</CardDescription>
-        )}
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <CardTitle className="text-xl">{recipe.title}</CardTitle>
+            {recipe.description && (
+              <CardDescription>{recipe.description}</CardDescription>
+            )}
+          </div>
+          {onRecipeUpdated && (
+            <EditRecipeDialog recipe={recipe} onRecipeUpdated={onRecipeUpdated} />
+          )}
+        </div>
         <div className="flex gap-2 flex-wrap mt-2">
           {recipe.prep_time && (
             <Badge variant="secondary" className="flex items-center gap-1">
