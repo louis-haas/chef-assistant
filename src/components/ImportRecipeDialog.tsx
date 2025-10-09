@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Upload } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Upload, Link } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -13,7 +15,9 @@ interface ImportRecipeDialogProps {
 export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps) => {
   const [open, setOpen] = useState(false);
   const [recipeText, setRecipeText] = useState("");
+  const [recipeUrl, setRecipeUrl] = useState("");
   const [isImporting, setIsImporting] = useState(false);
+  const [activeTab, setActiveTab] = useState("text");
 
   const parseRecipeResponse = (parsedText: string) => {
     const lines = parsedText.split('\n');
@@ -58,7 +62,14 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
   };
 
   const handleImport = async () => {
-    if (!recipeText.trim()) {
+    const isUrlMode = activeTab === "url";
+    
+    if (isUrlMode && !recipeUrl.trim()) {
+      toast.error("Veuillez entrer une URL");
+      return;
+    }
+    
+    if (!isUrlMode && !recipeText.trim()) {
       toast.error("Veuillez coller le texte d'une recette");
       return;
     }
@@ -73,7 +84,7 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
       }
 
       const { data: functionData, error: functionError } = await supabase.functions.invoke('import-recipe', {
-        body: { recipeText }
+        body: isUrlMode ? { recipeUrl } : { recipeText }
       });
 
       if (functionError) throw functionError;
@@ -119,6 +130,7 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
 
       toast.success("Recette importée et ajoutée à votre to-do!");
       setRecipeText("");
+      setRecipeUrl("");
       setOpen(false);
       onRecipeImported();
     } catch (error) {
@@ -141,24 +153,51 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
         <DialogHeader>
           <DialogTitle>Importer une recette</DialogTitle>
           <DialogDescription>
-            Collez le texte d'une recette (titre, ingrédients, instructions) et l'IA l'analysera automatiquement.
+            Importez une recette via texte ou URL et l'IA l'analysera automatiquement.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
-          <Textarea
-            placeholder="Collez ici le texte complet de votre recette..."
-            value={recipeText}
-            onChange={(e) => setRecipeText(e.target.value)}
-            className="min-h-[300px]"
-          />
-          <Button 
-            onClick={handleImport} 
-            disabled={isImporting || !recipeText.trim()}
-            className="w-full"
-          >
-            {isImporting ? "Import en cours..." : "Importer la recette"}
-          </Button>
-        </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="text">Texte</TabsTrigger>
+            <TabsTrigger value="url">URL</TabsTrigger>
+          </TabsList>
+          <TabsContent value="text" className="space-y-4">
+            <Textarea
+              placeholder="Collez ici le texte complet de votre recette..."
+              value={recipeText}
+              onChange={(e) => setRecipeText(e.target.value)}
+              className="min-h-[300px]"
+            />
+            <Button 
+              onClick={handleImport} 
+              disabled={isImporting || !recipeText.trim()}
+              className="w-full"
+            >
+              {isImporting ? "Import en cours..." : "Importer la recette"}
+            </Button>
+          </TabsContent>
+          <TabsContent value="url" className="space-y-4">
+            <div className="space-y-2">
+              <Input
+                type="url"
+                placeholder="https://example.com/ma-recette"
+                value={recipeUrl}
+                onChange={(e) => setRecipeUrl(e.target.value)}
+                className="w-full"
+              />
+              <p className="text-sm text-muted-foreground">
+                L'application va scraper la page et extraire la recette automatiquement.
+              </p>
+            </div>
+            <Button 
+              onClick={handleImport} 
+              disabled={isImporting || !recipeUrl.trim()}
+              className="w-full"
+            >
+              {isImporting ? "Import en cours..." : "Importer depuis l'URL"}
+            </Button>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );

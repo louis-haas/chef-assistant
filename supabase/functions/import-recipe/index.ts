@@ -12,14 +12,41 @@ serve(async (req) => {
   }
 
   try {
-    const { recipeText } = await req.json();
+    const { recipeText, recipeUrl } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    
+    let contentToProcess = recipeText;
 
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    const systemPrompt = `Tu es un assistant culinaire expert qui extrait les informations d'une recette à partir d'un texte libre.
+    // Si une URL est fournie, scraper la page
+    if (recipeUrl) {
+      try {
+        console.log('Fetching recipe from URL:', recipeUrl);
+        const response = await fetch(recipeUrl);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch URL: ${response.status}`);
+        }
+        const html = await response.text();
+        
+        // Extraire le texte visible du HTML (simple extraction)
+        contentToProcess = html
+          .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+          .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+          .replace(/<[^>]+>/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+        
+        console.log('Extracted text length:', contentToProcess.length);
+      } catch (error) {
+        console.error('Error fetching URL:', error);
+        throw new Error('Impossible de récupérer le contenu de l\'URL');
+      }
+    }
+
+    const systemPrompt = `Tu es un assistant culinaire expert qui extrait les informations d'une recette à partir d'un texte libre ou d'une page web.
 
 RÈGLES IMPORTANTES:
 - Extraire le titre de la recette
@@ -57,7 +84,7 @@ IMPORTANT: Dans les INSTRUCTIONS, séparer chaque étape par deux retours à la 
         model: 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: recipeText }
+          { role: 'user', content: contentToProcess }
         ],
       }),
     });
