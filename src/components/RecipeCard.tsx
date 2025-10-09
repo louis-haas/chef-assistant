@@ -66,9 +66,15 @@ export const RecipeCard = ({
           <div>
             <h4 className="font-semibold mb-2">Ingrédients:</h4>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              {recipe.ingredients.map((ingredient, idx) => (
-                <li key={idx}>{ingredient}</li>
-              ))}
+              {recipe.ingredients.map((ingredient, idx) => {
+                const [name, quantity, unit] = ingredient.split('|');
+                const displayText = quantity 
+                  ? unit 
+                    ? `${name} - ${quantity} ${unit}`
+                    : `${name} - ${quantity}`
+                  : name;
+                return <li key={idx}>{displayText}</li>;
+              })}
             </ul>
           </div>
           <div>

@@ -25,6 +25,7 @@ interface Ingredient {
   id: string;
   name: string;
   quantity?: string;
+  unit?: string;
   checked: boolean;
   recipe_id?: string;
 }
@@ -33,6 +34,7 @@ interface GroupedIngredient {
   id: string;
   name: string;
   quantity?: string;
+  unit?: string;
   checked: boolean;
   originalIds: string[];
 }
@@ -127,7 +129,17 @@ const Index = () => {
   const handleAddToTodo = async (recipe: Recipe) => {
     try {
       await supabase.from("todo_recipes").insert({ user_id: session.user.id, recipe_id: recipe.id });
-      const ingredientsToAdd = recipe.ingredients.map(ing => ({ user_id: session.user.id, recipe_id: recipe.id, name: ing, checked: false }));
+      const ingredientsToAdd = recipe.ingredients.map(ing => {
+        const [name, quantity, unit] = ing.split('|');
+        return { 
+          user_id: session.user.id, 
+          recipe_id: recipe.id, 
+          name: name?.trim() || ing, 
+          quantity: quantity?.trim() || null,
+          unit: unit?.trim() || null,
+          checked: false 
+        };
+      });
       await supabase.from("ingredients").insert(ingredientsToAdd);
       await loadTodoRecipes();
       await loadIngredients();
@@ -169,20 +181,6 @@ const Index = () => {
   const handleRemoveIngredient = async (id: string) => {
     await supabase.from("ingredients").delete().eq("id", id);
     await loadIngredients();
-  };
-
-  const parseIngredientName = (fullName: string): { quantity: string; name: string } => {
-    // Extraire la quantité au début du nom (ex: "1 kg carottes" -> quantité: "1 kg", nom: "carottes")
-    // Le regex capture : nombre + optionnellement (espace + unité) + espace + nom
-    const match = fullName.match(/^([\d.,]+(?:\s+[a-zA-Zàâäéèêëïîôùûüÿç]+)?)\s+(.+)$/);
-    if (match) {
-      const quantity = match[1].trim();
-      const name = match[2].trim();
-      console.log(`Parsing "${fullName}" → quantity: "${quantity}", name: "${name}"`);
-      return { quantity, name };
-    }
-    console.log(`No match for "${fullName}"`);
-    return { quantity: '', name: fullName.trim() };
   };
 
   const parseQuantity = (quantity: string): { value: number; unit: string } | null => {
@@ -273,25 +271,26 @@ const Index = () => {
 
   const groupIngredients = (items: Ingredient[]): GroupedIngredient[] => {
     const grouped = items.reduce((acc, item) => {
-      // Parser le nom complet pour extraire quantité et nom de l'ingrédient
-      const parsed = parseIngredientName(item.name);
-      const cleanName = parsed.name.toLowerCase().trim();
-      const quantity = parsed.quantity || item.quantity;
+      const cleanName = item.name.toLowerCase().trim();
+      const quantity = item.quantity;
+      const unit = item.unit;
       
       if (!acc[cleanName]) {
         acc[cleanName] = {
           id: item.id,
-          name: parsed.name, // Nom sans la quantité
+          name: item.name,
           quantity: quantity,
+          unit: unit,
           checked: item.checked,
           originalIds: [item.id],
         };
       } else {
         acc[cleanName].originalIds.push(item.id);
-        // Si toutes les instances sont cochées, marquer le groupe comme coché
         acc[cleanName].checked = acc[cleanName].checked && item.checked;
-        // Additionner les quantités
-        acc[cleanName].quantity = addQuantities(acc[cleanName].quantity, quantity);
+        // Additionner les quantités si l'unité est la même
+        if (quantity && acc[cleanName].quantity && unit === acc[cleanName].unit) {
+          acc[cleanName].quantity = addQuantities(acc[cleanName].quantity, quantity);
+        }
       }
       return acc;
     }, {} as Record<string, GroupedIngredient>);

@@ -49,11 +49,13 @@ serve(async (req) => {
 
 RÈGLES IMPORTANTES pour les ingrédients:
 - Un ingrédient par ligne uniquement
-- Format: "quantité nom_ingrédient" (exemple: "200g tomates", "2 oignons")
+- Format EXACT: "nom_ingrédient|quantité|unité" (exemple: "tomates|200|g", "oignons|2|")
+- Les unités acceptées: g, mL, cc (cuillère à café), cs (cuillère à soupe), ou vide pour le nombre d'ingrédients
 - NE PAS inclure la façon de couper ou préparer (pas de "émincé", "en dés", "haché")
 - NE PAS inclure la fonction dans la recette (pas de "pour la sauce", "pour la garniture")
 - NE JAMAIS inclure sel et poivre dans la liste
 - Être précis sur les quantités
+- TOUJOURS utiliser le format avec les pipes |
 
 Ne réponds qu'avec le JSON, sans texte avant ou après.`
           },

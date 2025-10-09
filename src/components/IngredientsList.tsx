@@ -7,6 +7,7 @@ interface Ingredient {
   id: string;
   name: string;
   quantity?: string;
+  unit?: string;
   checked: boolean;
 }
 
@@ -52,7 +53,8 @@ export const IngredientsList = ({ ingredients, onToggle, onRemove }: Ingredients
                 />
                 <span className={ingredient.checked ? "line-through text-muted-foreground" : ""}>
                   {ingredient.name}
-                  {ingredient.quantity && ` - ${ingredient.quantity}`}
+                  {ingredient.quantity && ingredient.unit && ` - ${ingredient.quantity} ${ingredient.unit}`}
+                  {ingredient.quantity && !ingredient.unit && ` - ${ingredient.quantity}`}
                 </span>
               </div>
               <Button
