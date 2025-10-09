@@ -53,7 +53,7 @@ RÈGLES IMPORTANTES pour les ingrédients:
 - Les unités acceptées: g, mL, cc (cuillère à café), cs (cuillère à soupe), ou vide pour le nombre d'ingrédients
 - NE PAS inclure la façon de couper ou préparer (pas de "émincé", "en dés", "haché")
 - NE PAS inclure la fonction dans la recette (pas de "pour la sauce", "pour la garniture")
-- NE JAMAIS inclure sel et poivre dans la liste
+- NE JAMAIS inclure sel, poivre et eau dans la liste
 - Être précis sur les quantités
 - TOUJOURS utiliser le format avec les pipes |
 
