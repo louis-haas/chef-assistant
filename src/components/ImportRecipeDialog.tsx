@@ -80,7 +80,7 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
 
       const recipe = parseRecipeResponse(functionData.parsedRecipe);
 
-      const { error: insertError } = await supabase
+      const { data: insertedRecipe, error: insertError } = await supabase
         .from('recipes')
         .insert({
           user_id: user.id,
@@ -91,11 +91,33 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
           prep_time: recipe.prep_time,
           cook_time: recipe.cook_time,
           servings: recipe.servings
-        });
+        })
+        .select()
+        .single();
 
-      if (insertError) throw insertError;
+      if (insertError || !insertedRecipe) throw insertError;
 
-      toast.success("Recette importée avec succès!");
+      // Ajouter à la to-do
+      await supabase.from("todo_recipes").insert({ 
+        user_id: user.id, 
+        recipe_id: insertedRecipe.id 
+      });
+
+      // Ajouter les ingrédients
+      const ingredientsToAdd = recipe.ingredients.map(ing => {
+        const [name, quantity, unit] = ing.split('|');
+        return { 
+          user_id: user.id, 
+          recipe_id: insertedRecipe.id, 
+          name: name?.trim() || ing, 
+          quantity: quantity?.trim() || null,
+          unit: unit?.trim() || null,
+          checked: false 
+        };
+      });
+      await supabase.from("ingredients").insert(ingredientsToAdd);
+
+      toast.success("Recette importée et ajoutée à votre to-do!");
       setRecipeText("");
       setOpen(false);
       onRecipeImported();
