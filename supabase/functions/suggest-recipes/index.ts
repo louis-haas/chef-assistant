@@ -86,7 +86,15 @@ Ne réponds qu'avec le JSON, sans texte avant ou après.`
     // Parse the JSON response from the AI
     let recipes;
     try {
-      const parsed = JSON.parse(content);
+      // Nettoyer les balises markdown si présentes
+      let cleanContent = content.trim();
+      if (cleanContent.startsWith('```json')) {
+        cleanContent = cleanContent.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+      } else if (cleanContent.startsWith('```')) {
+        cleanContent = cleanContent.replace(/^```\s*/, '').replace(/\s*```$/, '');
+      }
+      
+      const parsed = JSON.parse(cleanContent);
       recipes = parsed.recipes || parsed;
     } catch (e) {
       console.error('Failed to parse AI response as JSON:', content);
