@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Trash2 } from "lucide-react";
+import { Trash2, ShoppingCart } from "lucide-react";
+import { AddIngredientDialog } from "@/components/AddIngredientDialog";
 
 interface Ingredient {
   id: string;
@@ -15,32 +16,30 @@ interface IngredientsListProps {
   ingredients: Ingredient[];
   onToggle: (id: string, checked: boolean) => void;
   onRemove: (id: string) => void;
+  onIngredientAdded?: () => void;
 }
 
-export const IngredientsList = ({ ingredients, onToggle, onRemove }: IngredientsListProps) => {
-  if (ingredients.length === 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Liste d'ingrédients</CardTitle>
-          <CardDescription>
-            Ajoutez des recettes à votre to-do pour voir les ingrédients ici
-          </CardDescription>
-        </CardHeader>
-      </Card>
-    );
-  }
+export const IngredientsList = ({ ingredients, onToggle, onRemove, onIngredientAdded }: IngredientsListProps) => {
+  const checkedCount = ingredients.filter(i => i.checked).length;
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Liste d'ingrédients</CardTitle>
-        <CardDescription>
-          {ingredients.filter(i => !i.checked).length} ingrédients restants
-        </CardDescription>
+        <CardTitle className="flex items-center gap-2">
+          <ShoppingCart className="h-5 w-5" />
+          Liste de courses ({checkedCount}/{ingredients.length})
+        </CardTitle>
       </CardHeader>
-      <CardContent>
-        <ul className="space-y-2">
+      <CardContent className="space-y-3">
+        {onIngredientAdded && (
+          <AddIngredientDialog onIngredientAdded={onIngredientAdded} />
+        )}
+        {ingredients.length === 0 ? (
+          <p className="text-center text-muted-foreground py-4">
+            Ajoutez des recettes à votre to-do ou ajoutez des ingrédients manuellement
+          </p>
+        ) : (
+          <ul className="space-y-2">
           {ingredients.map((ingredient) => (
             <li
               key={ingredient.id}
@@ -66,7 +65,8 @@ export const IngredientsList = ({ ingredients, onToggle, onRemove }: Ingredients
               </Button>
             </li>
           ))}
-        </ul>
+          </ul>
+        )}
       </CardContent>
     </Card>
   );

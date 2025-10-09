@@ -375,7 +375,8 @@ const Index = () => {
               onRemove={(id) => {
                 const ingredient = groupedIngredients.find(i => i.id === id);
                 if (ingredient) handleRemoveGroupedIngredient(ingredient.originalIds);
-              }} 
+              }}
+              onIngredientAdded={loadIngredients}
             />
           </div>
         </div>
