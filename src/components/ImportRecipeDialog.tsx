@@ -127,7 +127,20 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
       });
 
       if (functionError) {
-        const errorMessage = functionData?.error || functionError.message || "Erreur lors de l'import de la recette";
+        let errorMessage = "Erreur lors de l'import de la recette";
+        
+        // Handle specific error messages
+        if (functionData?.error) {
+          errorMessage = functionData.error;
+        } else if (functionError.message) {
+          errorMessage = functionError.message;
+        }
+        
+        // Add helpful message for 503 errors
+        if (errorMessage.includes('temporairement indisponible')) {
+          errorMessage += " Le service AI est en maintenance, veuillez réessayer dans quelques minutes.";
+        }
+        
         toast.error(errorMessage);
         throw functionError;
       }
