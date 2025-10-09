@@ -194,6 +194,16 @@ IMPORTANT: Dans les INSTRUCTIONS, séparer chaque étape par deux retours à la 
     }
 
     const data = await response.json();
+    console.log('AI API response data:', JSON.stringify(data).substring(0, 500));
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Invalid AI API response structure:', JSON.stringify(data));
+      return new Response(
+        JSON.stringify({ error: 'Format de réponse invalide de l\'API AI' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
     let parsedText = data.choices[0].message.content;
 
     // Convert units in ingredients
