@@ -21,7 +21,7 @@ export const AddIngredientDialog = ({ onIngredientAdded }: AddIngredientDialogPr
 
   const handleAdd = async () => {
     if (!name.trim()) {
-      toast.error("Le nom de l'ingrédient est requis");
+      toast.error("Le nom de l'item est requis");
       return;
     }
 
@@ -46,7 +46,7 @@ export const AddIngredientDialog = ({ onIngredientAdded }: AddIngredientDialogPr
 
       if (error) throw error;
 
-      toast.success("Ingrédient ajouté!");
+      toast.success("Item ajouté!");
       setName("");
       setQuantity("");
       setUnit("");
@@ -65,19 +65,19 @@ export const AddIngredientDialog = ({ onIngredientAdded }: AddIngredientDialogPr
       <DialogTrigger asChild>
         <Button size="sm" className="w-full">
           <Plus className="h-4 w-4 mr-2" />
-          Ajouter un ingrédient
+          Ajouter un item
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Ajouter un ingrédient</DialogTitle>
+          <DialogTitle>Ajouter un item</DialogTitle>
           <DialogDescription>
-            Ajoutez manuellement un ingrédient à votre liste de courses
+            Ajoutez manuellement un item à votre liste de courses
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <Label htmlFor="name">Nom de l'ingrédient *</Label>
+            <Label htmlFor="name">Nom de l'item *</Label>
             <Input
               id="name"
               value={name}

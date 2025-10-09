@@ -36,7 +36,7 @@ export const IngredientsList = ({ ingredients, onToggle, onRemove, onIngredientA
         )}
         {ingredients.length === 0 ? (
           <p className="text-center text-muted-foreground py-4">
-            Ajoutez des recettes à votre to-do ou ajoutez des ingrédients manuellement
+            Ajoutez des recettes à votre to-do ou ajoutez des items manuellement
           </p>
         ) : (
           <ul className="space-y-2">
