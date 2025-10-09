@@ -43,8 +43,12 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
         currentSection = 'ingredients';
       } else if (trimmedLine.startsWith('INSTRUCTIONS:')) {
         currentSection = 'instructions';
-        instructions = trimmedLine.replace('INSTRUCTIONS:', '').trim();
+        const firstLine = trimmedLine.replace('INSTRUCTIONS:', '').trim();
+        if (firstLine) {
+          instructions = firstLine;
+        }
       } else if (trimmedLine.startsWith('TEMPS_PREP:')) {
+        currentSection = '';
         const time = trimmedLine.replace('TEMPS_PREP:', '').trim();
         prep_time = time === 'N/A' ? null : time;
       } else if (trimmedLine.startsWith('TEMPS_CUISSON:')) {
@@ -55,6 +59,8 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
         servings = portions === 'N/A' ? null : parseInt(portions);
       } else if (currentSection === 'ingredients' && trimmedLine && !trimmedLine.startsWith('INSTRUCTIONS:')) {
         ingredients.push(trimmedLine);
+      } else if (currentSection === 'instructions' && trimmedLine) {
+        instructions += (instructions ? '\n\n' : '') + trimmedLine;
       }
     }
 
