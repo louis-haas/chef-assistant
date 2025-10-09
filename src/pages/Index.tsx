@@ -171,6 +171,85 @@ const Index = () => {
     await loadIngredients();
   };
 
+  const parseQuantity = (quantity: string): { value: number; unit: string } | null => {
+    if (!quantity) return null;
+    
+    // Extraire le nombre et l'unité
+    const match = quantity.match(/^([\d.,]+)\s*([a-zA-Zàâäéèêëïîôùûüÿç]*)/);
+    if (!match) return null;
+    
+    const value = parseFloat(match[1].replace(',', '.'));
+    const unit = match[2].toLowerCase().trim();
+    
+    return { value, unit };
+  };
+
+  const convertToBaseUnit = (value: number, unit: string): { value: number; unit: string } => {
+    // Convertir en unité de base (g pour poids, ml pour volume)
+    const weightUnits: Record<string, number> = {
+      'kg': 1000,
+      'g': 1,
+      'mg': 0.001,
+    };
+    
+    const volumeUnits: Record<string, number> = {
+      'l': 1000,
+      'ml': 1,
+      'cl': 10,
+      'dl': 100,
+    };
+    
+    if (weightUnits[unit]) {
+      return { value: value * weightUnits[unit], unit: 'g' };
+    }
+    
+    if (volumeUnits[unit]) {
+      return { value: value * volumeUnits[unit], unit: 'ml' };
+    }
+    
+    // Si unité non reconnue, retourner tel quel
+    return { value, unit };
+  };
+
+  const formatQuantity = (value: number, unit: string): string => {
+    // Si c'est en grammes et >= 1000, convertir en kg
+    if (unit === 'g' && value >= 1000) {
+      return `${(value / 1000).toFixed(3).replace(/\.?0+$/, '')} kg`;
+    }
+    
+    // Si c'est en ml et >= 1000, convertir en L
+    if (unit === 'ml' && value >= 1000) {
+      return `${(value / 1000).toFixed(3).replace(/\.?0+$/, '')} L`;
+    }
+    
+    // Formater avec maximum 3 décimales et enlever les zéros inutiles
+    const formatted = value.toFixed(3).replace(/\.?0+$/, '');
+    return unit ? `${formatted} ${unit}` : formatted;
+  };
+
+  const addQuantities = (qty1: string | undefined, qty2: string | undefined): string | undefined => {
+    if (!qty1) return qty2;
+    if (!qty2) return qty1;
+    
+    const parsed1 = parseQuantity(qty1);
+    const parsed2 = parseQuantity(qty2);
+    
+    if (!parsed1) return qty2;
+    if (!parsed2) return qty1;
+    
+    const base1 = convertToBaseUnit(parsed1.value, parsed1.unit);
+    const base2 = convertToBaseUnit(parsed2.value, parsed2.unit);
+    
+    // Si les unités de base sont différentes, concaténer
+    if (base1.unit !== base2.unit) {
+      return `${qty1}, ${qty2}`;
+    }
+    
+    // Additionner et formater
+    const total = base1.value + base2.value;
+    return formatQuantity(total, base1.unit);
+  };
+
   const groupIngredients = (items: Ingredient[]): GroupedIngredient[] => {
     const grouped = items.reduce((acc, item) => {
       const key = item.name.toLowerCase().trim();
@@ -186,12 +265,8 @@ const Index = () => {
         acc[key].originalIds.push(item.id);
         // Si toutes les instances sont cochées, marquer le groupe comme coché
         acc[key].checked = acc[key].checked && item.checked;
-        // Combiner les quantités
-        if (item.quantity) {
-          acc[key].quantity = acc[key].quantity 
-            ? `${acc[key].quantity}, ${item.quantity}` 
-            : item.quantity;
-        }
+        // Additionner les quantités
+        acc[key].quantity = addQuantities(acc[key].quantity, item.quantity);
       }
       return acc;
     }, {} as Record<string, GroupedIngredient>);
