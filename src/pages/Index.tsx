@@ -6,6 +6,8 @@ import { RecipeCard } from "@/components/RecipeCard";
 import { IngredientsList } from "@/components/IngredientsList";
 import { ImportRecipeDialog } from "@/components/ImportRecipeDialog";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { TagManager } from "@/components/TagManager";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
@@ -50,6 +52,8 @@ const Index = () => {
   const [todoRecipes, setTodoRecipes] = useState<Recipe[]>([]);
   const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+  const [allTags, setAllTags] = useState<any[]>([]);
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -73,6 +77,7 @@ const Index = () => {
       loadTodoRecipes();
       loadFavoriteRecipes();
       loadIngredients();
+      loadTags();
     }
   }, [session]);
 
@@ -99,6 +104,15 @@ const Index = () => {
       .eq("user_id", session.user.id)
       .order("created_at", { ascending: true });
     if (!error) setIngredients(data || []);
+  };
+
+  const loadTags = async () => {
+    const { data } = await supabase
+      .from("tags")
+      .select("*")
+      .eq("user_id", session.user.id)
+      .order("name");
+    setAllTags(data || []);
   };
 
   const fetchUserRecipes = async () => {
@@ -330,6 +344,35 @@ const Index = () => {
 
   const groupedIngredients = groupIngredients(ingredients);
 
+  const getFilteredFavorites = async () => {
+    if (selectedTagIds.length === 0) {
+      return favoriteRecipes;
+    }
+
+    // Récupérer les recipe_ids qui ont au moins un des tags sélectionnés
+    const { data: recipeTagsData } = await supabase
+      .from("recipe_tags")
+      .select("recipe_id")
+      .in("tag_id", selectedTagIds);
+
+    const recipeIds = recipeTagsData?.map(rt => rt.recipe_id) || [];
+    return favoriteRecipes.filter(recipe => recipeIds.includes(recipe.id));
+  };
+
+  const [filteredFavorites, setFilteredFavorites] = useState<Recipe[]>([]);
+
+  useEffect(() => {
+    getFilteredFavorites().then(setFilteredFavorites);
+  }, [selectedTagIds, favoriteRecipes]);
+
+  const handleToggleTagFilter = (tagId: string) => {
+    setSelectedTagIds(prev =>
+      prev.includes(tagId)
+        ? prev.filter(id => id !== tagId)
+        : [...prev, tagId]
+    );
+  };
+
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
   if (!session) return <Auth />;
 
@@ -368,7 +411,49 @@ const Index = () => {
                 {todoRecipes.length === 0 ? <p className="text-center text-muted-foreground py-8">{t("noTodoRecipes")}</p> : <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">{todoRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} onAddToTodo={handleAddToTodo} onAddToFavorites={handleAddToFavorites} isTodo isFavorite={favoriteRecipes.some(r => r.id === recipe.id)} onRemoveFromTodo={handleRemoveFromTodo} onRecipeUpdated={fetchUserRecipes} />)}</div>}
               </TabsContent>
               <TabsContent value="favorites" className="space-y-4">
-                {favoriteRecipes.length === 0 ? <p className="text-center text-muted-foreground py-8">{t("noFavoriteRecipes")}</p> : <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">{favoriteRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} onAddToTodo={handleAddToTodo} onAddToFavorites={handleAddToFavorites} isTodo={todoRecipes.some(r => r.id === recipe.id)} isFavorite onRemoveFromFavorites={handleRemoveFromFavorites} onRecipeUpdated={fetchUserRecipes} />)}</div>}
+                {favoriteRecipes.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">{t("noFavoriteRecipes")}</p>
+                ) : (
+                  <>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <TagManager userId={session.user.id} onTagsUpdated={loadTags} />
+                      {allTags.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {allTags.map((tag) => (
+                            <Badge
+                              key={tag.id}
+                              style={{ 
+                                backgroundColor: selectedTagIds.includes(tag.id) ? tag.color : 'transparent',
+                                borderColor: tag.color,
+                                color: selectedTagIds.includes(tag.id) ? 'white' : tag.color,
+                              }}
+                              className="cursor-pointer border-2"
+                              onClick={() => handleToggleTagFilter(tag.id)}
+                            >
+                              {tag.name}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
+                      {filteredFavorites.map(recipe => (
+                        <RecipeCard
+                          key={recipe.id}
+                          recipe={recipe}
+                          onAddToTodo={handleAddToTodo}
+                          onAddToFavorites={handleAddToFavorites}
+                          isTodo={todoRecipes.some(r => r.id === recipe.id)}
+                          isFavorite
+                          onRemoveFromFavorites={handleRemoveFromFavorites}
+                          onRecipeUpdated={fetchUserRecipes}
+                          userId={session.user.id}
+                          showTags
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
               </TabsContent>
             </Tabs>
           </div>

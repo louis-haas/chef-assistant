@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { Heart, ListTodo, Clock, Users } from "lucide-react";
 import { EditRecipeDialog } from "@/components/EditRecipeDialog";
+import { RecipeTagSelector } from "@/components/RecipeTagSelector";
 
 interface Recipe {
   id: string;
@@ -24,6 +25,8 @@ interface RecipeCardProps {
   onRemoveFromTodo?: (recipeId: string) => void;
   onRemoveFromFavorites?: (recipeId: string) => void;
   onRecipeUpdated?: () => void;
+  userId?: string;
+  showTags?: boolean;
 }
 
 export const RecipeCard = ({
@@ -35,6 +38,8 @@ export const RecipeCard = ({
   onRemoveFromTodo,
   onRemoveFromFavorites,
   onRecipeUpdated,
+  userId,
+  showTags = false,
 }: RecipeCardProps) => {
   return (
     <Card className="h-full flex flex-col">
@@ -95,7 +100,15 @@ export const RecipeCard = ({
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex flex-col sm:flex-row gap-2">
+      <CardFooter className="flex flex-col gap-2">
+        {showTags && userId && (
+          <RecipeTagSelector
+            recipeId={recipe.id}
+            userId={userId}
+            onTagsChanged={onRecipeUpdated}
+          />
+        )}
+        <div className="flex flex-col sm:flex-row gap-2 w-full">
         {isTodo ? (
           <Button
             variant="outline"
@@ -138,6 +151,7 @@ export const RecipeCard = ({
             <span className="text-xs sm:text-sm">Ajouter aux favoris</span>
           </Button>
         )}
+        </div>
       </CardFooter>
     </Card>
   );
