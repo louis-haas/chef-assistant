@@ -97,13 +97,12 @@ export const AddIngredientDialog = ({ onIngredientAdded }: AddIngredientDialogPr
               />
             </div>
             <div>
-              <Label htmlFor="unit">Unité</Label>
+              <Label htmlFor="unit">Unité (optionnel)</Label>
               <Select value={unit} onValueChange={setUnit}>
                 <SelectTrigger id="unit">
-                  <SelectValue placeholder="Sélectionner" />
+                  <SelectValue placeholder="Aucune" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Aucune</SelectItem>
                   <SelectItem value="g">g (grammes)</SelectItem>
                   <SelectItem value="mL">mL (millilitres)</SelectItem>
                   <SelectItem value="cc">cc (cuillère à café)</SelectItem>
