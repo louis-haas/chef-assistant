@@ -171,6 +171,15 @@ const Index = () => {
     await loadIngredients();
   };
 
+  const parseIngredientName = (fullName: string): { quantity: string; name: string } => {
+    // Extraire la quantité au début du nom (ex: "1 kg carottes" -> quantité: "1 kg", nom: "carottes")
+    const match = fullName.match(/^([\d.,]+\s*[a-zA-Zàâäéèêëïîôùûüÿç]*)\s+(.+)$/);
+    if (match) {
+      return { quantity: match[1].trim(), name: match[2].trim() };
+    }
+    return { quantity: '', name: fullName.trim() };
+  };
+
   const parseQuantity = (quantity: string): { value: number; unit: string } | null => {
     if (!quantity) return null;
     
@@ -252,21 +261,25 @@ const Index = () => {
 
   const groupIngredients = (items: Ingredient[]): GroupedIngredient[] => {
     const grouped = items.reduce((acc, item) => {
-      const key = item.name.toLowerCase().trim();
-      if (!acc[key]) {
-        acc[key] = {
+      // Parser le nom complet pour extraire quantité et nom de l'ingrédient
+      const parsed = parseIngredientName(item.name);
+      const cleanName = parsed.name.toLowerCase().trim();
+      const quantity = parsed.quantity || item.quantity;
+      
+      if (!acc[cleanName]) {
+        acc[cleanName] = {
           id: item.id,
-          name: item.name,
-          quantity: item.quantity,
+          name: parsed.name, // Nom sans la quantité
+          quantity: quantity,
           checked: item.checked,
           originalIds: [item.id],
         };
       } else {
-        acc[key].originalIds.push(item.id);
+        acc[cleanName].originalIds.push(item.id);
         // Si toutes les instances sont cochées, marquer le groupe comme coché
-        acc[key].checked = acc[key].checked && item.checked;
+        acc[cleanName].checked = acc[cleanName].checked && item.checked;
         // Additionner les quantités
-        acc[key].quantity = addQuantities(acc[key].quantity, item.quantity);
+        acc[cleanName].quantity = addQuantities(acc[cleanName].quantity, quantity);
       }
       return acc;
     }, {} as Record<string, GroupedIngredient>);
