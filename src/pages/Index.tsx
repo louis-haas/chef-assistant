@@ -336,7 +336,7 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ChefHat className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-bold">Assistant Culinaire</h1>
+            <h1 className="text-2xl font-bold">Oui Chef!</h1>
           </div>
           <div className="flex gap-2">
             <ImportRecipeDialog onRecipeImported={fetchUserRecipes} />
