@@ -145,20 +145,7 @@ IMPORTANT: Dans les INSTRUCTIONS, séparer chaque étape par deux retours à la 
       };
     }
 
-    const requestBody: any = {
-      model: 'google/gemini-2.5-flash',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        userMessage
-      ],
-    };
-
-    // Add modalities for image processing
-    if (imageData) {
-      requestBody.modalities = ['text', 'image'];
-    }
-
-    console.log('Sending request to AI API with model:', requestBody.model);
+    console.log('Sending request to AI API with model: google/gemini-2.5-flash');
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -166,7 +153,13 @@ IMPORTANT: Dans les INSTRUCTIONS, séparer chaque étape par deux retours à la 
         'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(requestBody),
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          userMessage
+        ],
+      }),
     });
 
     if (!response.ok) {
