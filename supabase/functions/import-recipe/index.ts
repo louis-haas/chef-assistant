@@ -6,6 +6,44 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+function convertUnits(text: string): string {
+  const lines = text.split('\n');
+  const convertedLines = lines.map(line => {
+    // Check if line contains ingredient format (name|quantity|unit)
+    if (line.includes('|')) {
+      const parts = line.split('|');
+      if (parts.length === 3) {
+        let [name, quantity, unit] = parts;
+        const numValue = parseFloat(quantity);
+        
+        if (!isNaN(numValue)) {
+          // Convert volume units to mL
+          if (unit.trim().toLowerCase() === 'l') {
+            quantity = String(numValue * 1000);
+            unit = 'mL';
+          } else if (unit.trim().toLowerCase() === 'dl') {
+            quantity = String(numValue * 100);
+            unit = 'mL';
+          } else if (unit.trim().toLowerCase() === 'cl') {
+            quantity = String(numValue * 10);
+            unit = 'mL';
+          }
+          // Convert weight units to g
+          else if (unit.trim().toLowerCase() === 'kg') {
+            quantity = String(numValue * 1000);
+            unit = 'g';
+          }
+        }
+        
+        return `${name}|${quantity}|${unit}`;
+      }
+    }
+    return line;
+  });
+  
+  return convertedLines.join('\n');
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -106,7 +144,10 @@ IMPORTANT: Dans les INSTRUCTIONS, séparer chaque étape par deux retours à la 
     }
 
     const data = await response.json();
-    const parsedText = data.choices[0].message.content;
+    let parsedText = data.choices[0].message.content;
+
+    // Convert units in ingredients
+    parsedText = convertUnits(parsedText);
 
     console.log('Parsed recipe:', parsedText);
 
