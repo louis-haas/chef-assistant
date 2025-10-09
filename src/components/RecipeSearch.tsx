@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Search } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface RecipeSearchProps {
   onSearch: (prompt: string) => void;
@@ -11,6 +12,7 @@ interface RecipeSearchProps {
 
 export const RecipeSearch = ({ onSearch, isLoading }: RecipeSearchProps) => {
   const [prompt, setPrompt] = useState("");
+  const { t } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,25 +22,25 @@ export const RecipeSearch = ({ onSearch, isLoading }: RecipeSearchProps) => {
   };
 
   const suggestions = [
-    "Des recettes végétariennes rapides",
-    "Des desserts sans gluten",
-    "Des plats italiens traditionnels",
-    "Des recettes pour le dîner",
+    t("suggestion1"),
+    t("suggestion2"),
+    t("suggestion3"),
+    t("suggestion4"),
   ];
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Rechercher des recettes</CardTitle>
+        <CardTitle>{t("searchRecipesTitle")}</CardTitle>
         <CardDescription>
-          Décrivez ce que vous aimeriez cuisiner et l'IA vous suggérera des recettes
+          {t("searchRecipesDescription")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex gap-2">
             <Input
-              placeholder="Ex: des recettes de pâtes faciles..."
+              placeholder={t("searchInputPlaceholder")}
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               disabled={isLoading}
@@ -52,7 +54,7 @@ export const RecipeSearch = ({ onSearch, isLoading }: RecipeSearchProps) => {
             </Button>
           </div>
           <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">Suggestions:</p>
+            <p className="text-sm text-muted-foreground">{t("suggestionsLabel")}</p>
             <div className="flex flex-wrap gap-2">
               {suggestions.map((suggestion, idx) => (
                 <Button

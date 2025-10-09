@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox";
 import { Trash2, ShoppingCart } from "lucide-react";
 import { AddIngredientDialog } from "@/components/AddIngredientDialog";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Ingredient {
   id: string;
@@ -21,13 +22,14 @@ interface IngredientsListProps {
 
 export const IngredientsList = ({ ingredients, onToggle, onRemove, onIngredientAdded }: IngredientsListProps) => {
   const checkedCount = ingredients.filter(i => i.checked).length;
+  const { t } = useLanguage();
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <ShoppingCart className="h-5 w-5" />
-          Liste de courses ({checkedCount}/{ingredients.length})
+          {t("shoppingList")} ({checkedCount}/{ingredients.length})
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -36,7 +38,7 @@ export const IngredientsList = ({ ingredients, onToggle, onRemove, onIngredientA
         )}
         {ingredients.length === 0 ? (
           <p className="text-center text-muted-foreground py-4">
-            Ajoutez des recettes à votre to-do ou ajoutez des items manuellement
+            {t("addItemsManually")}
           </p>
         ) : (
           <ul className="space-y-2">

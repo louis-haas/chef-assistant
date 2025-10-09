@@ -13,6 +13,14 @@ export const translations = {
     searchPlaceholder: "Quelles recettes cherchez-vous ?",
     searchButton: "Chercher",
     searching: "Recherche...",
+    searchRecipesTitle: "Rechercher des recettes",
+    searchRecipesDescription: "Décrivez ce que vous aimeriez cuisiner et l'IA vous suggérera des recettes",
+    searchInputPlaceholder: "Ex: des recettes de pâtes faciles...",
+    suggestionsLabel: "Suggestions:",
+    suggestion1: "Des recettes végétariennes rapides",
+    suggestion2: "Des desserts sans gluten",
+    suggestion3: "Des plats italiens traditionnels",
+    suggestion4: "Des recettes pour le dîner",
     
     // Recipe Card
     preparation: "Préparation",
@@ -103,6 +111,14 @@ export const translations = {
     searchPlaceholder: "What recipes are you looking for?",
     searchButton: "Search",
     searching: "Searching...",
+    searchRecipesTitle: "Search for recipes",
+    searchRecipesDescription: "Describe what you'd like to cook and AI will suggest recipes",
+    searchInputPlaceholder: "E.g. easy pasta recipes...",
+    suggestionsLabel: "Suggestions:",
+    suggestion1: "Quick vegetarian recipes",
+    suggestion2: "Gluten-free desserts",
+    suggestion3: "Traditional Italian dishes",
+    suggestion4: "Dinner recipes",
     
     // Recipe Card
     preparation: "Prep",
