@@ -52,13 +52,13 @@ export const RecipeCard = ({
 
   return (
     <Card className="h-full flex flex-col">
+      {showTags && userId && (
+        <div className="px-6 pt-6">
+          <RecipeTagDisplay recipeId={recipe.id} userId={userId} />
+        </div>
+      )}
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        {showTags && userId && (
-          <div className="px-6 pt-6 pb-0">
-            <RecipeTagDisplay recipeId={recipe.id} userId={userId} />
-          </div>
-        )}
-        <CardHeader className={showTags && userId ? "pt-3" : ""}>
+        <CardHeader className={showTags && userId ? "pt-0" : ""}>
           <div className="flex items-start justify-between gap-2">
             <CollapsibleTrigger asChild>
               <button className="flex-1 text-left group">
