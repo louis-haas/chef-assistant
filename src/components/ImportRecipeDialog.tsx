@@ -257,10 +257,20 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
                   htmlFor="recipe-image-upload" 
                   className="cursor-pointer flex flex-col items-center gap-2"
                 >
-                  <Image className="h-12 w-12 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">
-                    {recipeImage ? "Image sélectionnée ✓" : "Cliquez pour sélectionner une photo de recette"}
-                  </span>
+                  {recipeImage ? (
+                    <img 
+                      src={recipeImage} 
+                      alt="Recipe preview" 
+                      className="max-h-64 rounded-lg object-contain"
+                    />
+                  ) : (
+                    <>
+                      <Image className="h-12 w-12 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">
+                        Cliquez pour sélectionner une photo de recette
+                      </span>
+                    </>
+                  )}
                 </label>
               </div>
               <p className="text-sm text-muted-foreground">
