@@ -91,7 +91,7 @@ export const translations = {
   },
   en: {
     // Header
-    appName: "Yes Chef!",
+    appName: "Oui Chef!",
     logout: "Logout",
     
     // Tabs
