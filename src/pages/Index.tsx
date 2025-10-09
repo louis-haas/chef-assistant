@@ -29,6 +29,14 @@ interface Ingredient {
   recipe_id?: string;
 }
 
+interface GroupedIngredient {
+  id: string;
+  name: string;
+  quantity?: string;
+  checked: boolean;
+  originalIds: string[];
+}
+
 const Index = () => {
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -163,6 +171,56 @@ const Index = () => {
     await loadIngredients();
   };
 
+  const groupIngredients = (items: Ingredient[]): GroupedIngredient[] => {
+    const grouped = items.reduce((acc, item) => {
+      const key = item.name.toLowerCase().trim();
+      if (!acc[key]) {
+        acc[key] = {
+          id: item.id,
+          name: item.name,
+          quantity: item.quantity,
+          checked: item.checked,
+          originalIds: [item.id],
+        };
+      } else {
+        acc[key].originalIds.push(item.id);
+        // Si toutes les instances sont cochées, marquer le groupe comme coché
+        acc[key].checked = acc[key].checked && item.checked;
+        // Combiner les quantités
+        if (item.quantity) {
+          acc[key].quantity = acc[key].quantity 
+            ? `${acc[key].quantity}, ${item.quantity}` 
+            : item.quantity;
+        }
+      }
+      return acc;
+    }, {} as Record<string, GroupedIngredient>);
+    
+    return Object.values(grouped);
+  };
+
+  const handleToggleGroupedIngredient = async (originalIds: string[], checked: boolean) => {
+    // Mettre à jour tous les ingrédients du groupe
+    await Promise.all(
+      originalIds.map(id => 
+        supabase.from("ingredients").update({ checked }).eq("id", id)
+      )
+    );
+    await loadIngredients();
+  };
+
+  const handleRemoveGroupedIngredient = async (originalIds: string[]) => {
+    // Supprimer tous les ingrédients du groupe
+    await Promise.all(
+      originalIds.map(id => 
+        supabase.from("ingredients").delete().eq("id", id)
+      )
+    );
+    await loadIngredients();
+  };
+
+  const groupedIngredients = groupIngredients(ingredients);
+
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
   if (!session) return <Auth />;
 
@@ -199,7 +257,17 @@ const Index = () => {
             </Tabs>
           </div>
           <div className="md:col-span-1">
-            <IngredientsList ingredients={ingredients} onToggle={handleToggleIngredient} onRemove={handleRemoveIngredient} />
+            <IngredientsList 
+              ingredients={groupedIngredients} 
+              onToggle={(id, checked) => {
+                const ingredient = groupedIngredients.find(i => i.id === id);
+                if (ingredient) handleToggleGroupedIngredient(ingredient.originalIds, checked);
+              }} 
+              onRemove={(id) => {
+                const ingredient = groupedIngredients.find(i => i.id === id);
+                if (ingredient) handleRemoveGroupedIngredient(ingredient.originalIds);
+              }} 
+            />
           </div>
         </div>
       </main>
