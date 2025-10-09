@@ -196,10 +196,21 @@ IMPORTANT: Dans les INSTRUCTIONS, séparer chaque étape par deux retours à la 
     const data = await response.json();
     console.log('AI API response data:', JSON.stringify(data).substring(0, 500));
     
+    // Vérifier si la réponse contient une erreur même avec status 200
+    if (data.error) {
+      console.error('AI API returned error in response body:', JSON.stringify(data.error));
+      const errorMessage = data.error.message || 'Erreur inconnue de l\'API AI';
+      return new Response(
+        JSON.stringify({ error: `Le service AI a rencontré une erreur: ${errorMessage}. Veuillez réessayer dans quelques instants.` }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Vérifier la structure de la réponse
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
       console.error('Invalid AI API response structure:', JSON.stringify(data));
       return new Response(
-        JSON.stringify({ error: 'Format de réponse invalide de l\'API AI' }),
+        JSON.stringify({ error: 'Format de réponse invalide de l\'API AI. Veuillez réessayer.' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
