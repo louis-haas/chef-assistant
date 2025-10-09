@@ -1,7 +1,7 @@
 export const translations = {
   fr: {
     // Header
-    appName: "Oui Chef!",
+    appName: "Oui, Chef!",
     logout: "Déconnexion",
     
     // Tabs
@@ -99,7 +99,7 @@ export const translations = {
   },
   en: {
     // Header
-    appName: "Oui Chef!",
+    appName: "Oui, Chef!",
     logout: "Logout",
     
     // Tabs
