@@ -144,10 +144,10 @@ const Index = () => {
 
       const recipesToSave = data.recipes.map((recipe: any) => ({
         user_id: session.user.id,
-        title: recipe.title,
-        description: recipe.description,
-        ingredients: recipe.ingredients,
-        instructions: recipe.instructions,
+        title: recipe.title.replace(/œu/gi, 'oeu'),
+        description: recipe.description?.replace(/œu/gi, 'oeu'),
+        ingredients: recipe.ingredients.map((ing: string) => ing.replace(/œu/gi, 'oeu')),
+        instructions: recipe.instructions.replace(/œu/gi, 'oeu'),
         prep_time: recipe.prep_time,
         cook_time: recipe.cook_time,
         servings: recipe.servings,
@@ -170,10 +170,11 @@ const Index = () => {
       await supabase.from("todo_recipes").insert({ user_id: session.user.id, recipe_id: recipe.id });
       const ingredientsToAdd = recipe.ingredients.map(ing => {
         const [name, quantity, unit] = ing.split('|');
+        const normalizedName = (name?.trim() || ing).replace(/œu/gi, 'oeu');
         return { 
           user_id: session.user.id, 
           recipe_id: recipe.id, 
-          name: name?.trim() || ing, 
+          name: normalizedName, 
           quantity: quantity?.trim() || null,
           unit: unit?.trim() || null,
           checked: false 

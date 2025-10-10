@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { normalizeText } from "@/lib/utils";
 
 interface AddIngredientDialogProps {
   onIngredientAdded: () => void;
@@ -38,7 +39,7 @@ export const AddIngredientDialog = ({ onIngredientAdded }: AddIngredientDialogPr
         .from('ingredients')
         .insert({
           user_id: user.id,
-          name: name.trim(),
+          name: normalizeText(name.trim()),
           quantity: quantity.trim() || null,
           unit: unit || null,
           checked: false

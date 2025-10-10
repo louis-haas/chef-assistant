@@ -44,6 +44,10 @@ function convertUnits(text: string): string {
   return convertedLines.join('\n');
 }
 
+function normalizeText(text: string): string {
+  return text.replace(/œu/gi, 'oeu');
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -216,6 +220,9 @@ IMPORTANT: Dans les INSTRUCTIONS, séparer chaque étape par deux retours à la 
     }
     
     let parsedText = data.choices[0].message.content;
+
+    // Normalize text (replace œu with oeu)
+    parsedText = normalizeText(parsedText);
 
     // Convert units in ingredients
     parsedText = convertUnits(parsedText);
