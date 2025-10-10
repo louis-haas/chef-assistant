@@ -6,6 +6,7 @@ import { Heart, ListTodo, Clock, Users, ChevronDown, ChevronUp } from "lucide-re
 import { EditRecipeDialog } from "@/components/EditRecipeDialog";
 import { RecipeTagSelector } from "@/components/RecipeTagSelector";
 import { RecipeTagDisplay } from "@/components/RecipeTagDisplay";
+import { ShareRecipeDialog } from "@/components/ShareRecipeDialog";
 import {
   Collapsible,
   CollapsibleContent,
@@ -136,15 +137,20 @@ export const RecipeCard = ({
         </CollapsibleContent>
       </Collapsible>
       <CardFooter className="flex flex-col gap-2 items-stretch">
-        {showTags && userId && (
-          <RecipeTagSelector
-            recipeId={recipe.id}
-            userId={userId}
-            onTagsChanged={onRecipeUpdated}
-            showBadges={false}
-            showButton={true}
-          />
-        )}
+        <div className="flex gap-2 w-full">
+          {showTags && userId && (
+            <RecipeTagSelector
+              recipeId={recipe.id}
+              userId={userId}
+              onTagsChanged={onRecipeUpdated}
+              showBadges={false}
+              showButton={true}
+            />
+          )}
+          {userId && (
+            <ShareRecipeDialog recipeId={recipe.id} userId={userId} />
+          )}
+        </div>
         {isTodo ? (
           <Button
             variant="outline"

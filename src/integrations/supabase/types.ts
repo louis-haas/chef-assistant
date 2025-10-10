@@ -43,6 +43,48 @@ export type Database = {
           },
         ]
       }
+      friends: {
+        Row: {
+          created_at: string | null
+          friend_id: string
+          id: string
+          status: Database["public"]["Enums"]["friendship_status"]
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          friend_id: string
+          id?: string
+          status?: Database["public"]["Enums"]["friendship_status"]
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          friend_id?: string
+          id?: string
+          status?: Database["public"]["Enums"]["friendship_status"]
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "friends_friend_id_fkey"
+            columns: ["friend_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "friends_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ingredients: {
         Row: {
           checked: boolean | null
@@ -83,6 +125,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          display_name: string | null
+          email: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string | null
+          display_name?: string | null
+          email?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: string | null
+          display_name?: string | null
+          email?: string | null
+          id?: string
+        }
+        Relationships: []
       }
       recipe_tags: {
         Row: {
@@ -147,6 +210,52 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_recipes: {
+        Row: {
+          created_at: string | null
+          id: string
+          recipe_id: string
+          shared_by_user_id: string
+          shared_with_user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          recipe_id: string
+          shared_by_user_id: string
+          shared_with_user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          recipe_id?: string
+          shared_by_user_id?: string
+          shared_with_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_recipes_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shared_recipes_shared_by_user_id_fkey"
+            columns: ["shared_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shared_recipes_shared_with_user_id_fkey"
+            columns: ["shared_with_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tags: {
         Row: {
           color: string
@@ -208,7 +317,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      friendship_status: "pending" | "accepted" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -335,6 +444,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      friendship_status: ["pending", "accepted", "rejected"],
+    },
   },
 } as const

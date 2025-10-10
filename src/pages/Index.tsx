@@ -7,6 +7,7 @@ import { IngredientsList } from "@/components/IngredientsList";
 import { ImportRecipeDialog } from "@/components/ImportRecipeDialog";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { TagManager } from "@/components/TagManager";
+import { FriendsManager } from "@/components/FriendsManager";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -51,6 +52,7 @@ const Index = () => {
   const [suggestedRecipes, setSuggestedRecipes] = useState<Recipe[]>([]);
   const [todoRecipes, setTodoRecipes] = useState<Recipe[]>([]);
   const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
+  const [sharedRecipes, setSharedRecipes] = useState<Recipe[]>([]);
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [allTags, setAllTags] = useState<any[]>([]);
@@ -76,6 +78,7 @@ const Index = () => {
     if (session) {
       loadTodoRecipes();
       loadFavoriteRecipes();
+      loadSharedRecipes();
       loadIngredients();
       loadTags();
     }
@@ -95,6 +98,18 @@ const Index = () => {
       .select(`recipe_id, recipes (*)`)
       .eq("user_id", session.user.id);
     if (!error) setFavoriteRecipes(data?.map((item: any) => item.recipes).filter(Boolean) || []);
+  };
+
+  const loadSharedRecipes = async () => {
+    const { data, error } = await supabase
+      .from("shared_recipes")
+      .select(`
+        recipe_id,
+        recipes (*),
+        shared_by:profiles!shared_recipes_shared_by_user_id_fkey(display_name, email)
+      `)
+      .eq("shared_with_user_id", session.user.id);
+    if (!error) setSharedRecipes(data?.map((item: any) => item.recipes).filter(Boolean) || []);
   };
 
   const loadIngredients = async () => {
@@ -399,10 +414,11 @@ const Index = () => {
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             <RecipeSearch onSearch={handleSearch} isLoading={searchLoading} />
             <Tabs defaultValue="suggestions">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="suggestions" className="text-xs sm:text-sm">{t("suggestions")}</TabsTrigger>
                 <TabsTrigger value="todo" className="text-xs sm:text-sm">{t("todo")} ({todoRecipes.length})</TabsTrigger>
                 <TabsTrigger value="favorites" className="text-xs sm:text-sm">{t("favorites")} ({favoriteRecipes.length})</TabsTrigger>
+                <TabsTrigger value="shared" className="text-xs sm:text-sm">Partagées ({sharedRecipes.length})</TabsTrigger>
               </TabsList>
               <TabsContent value="suggestions" className="space-y-4">
                 {suggestedRecipes.length === 0 ? <p className="text-center text-muted-foreground py-8">{t("searchRecipes")}</p> : <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">{suggestedRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} onAddToTodo={handleAddToTodo} onAddToFavorites={handleAddToFavorites} isTodo={todoRecipes.some(r => r.id === recipe.id)} isFavorite={favoriteRecipes.some(r => r.id === recipe.id)} onRecipeUpdated={fetchUserRecipes} />)}</div>}
@@ -455,11 +471,32 @@ const Index = () => {
                   </>
                 )}
               </TabsContent>
+              <TabsContent value="shared" className="space-y-4">
+                {sharedRecipes.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">Aucune recette partagée</p>
+                ) : (
+                  <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
+                    {sharedRecipes.map(recipe => (
+                      <RecipeCard
+                        key={recipe.id}
+                        recipe={recipe}
+                        onAddToTodo={handleAddToTodo}
+                        onAddToFavorites={handleAddToFavorites}
+                        isTodo={todoRecipes.some(r => r.id === recipe.id)}
+                        isFavorite={favoriteRecipes.some(r => r.id === recipe.id)}
+                        onRecipeUpdated={loadSharedRecipes}
+                        userId={session.user.id}
+                      />
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
             </Tabs>
           </div>
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 space-y-4">
+            <FriendsManager userId={session.user.id} />
             <IngredientsList
-              ingredients={groupedIngredients} 
+              ingredients={groupedIngredients}
               onToggle={(id, checked) => {
                 const ingredient = groupedIngredients.find(i => i.id === id);
                 if (ingredient) handleToggleGroupedIngredient(ingredient.originalIds, checked);
