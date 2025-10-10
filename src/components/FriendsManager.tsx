@@ -85,7 +85,7 @@ export const FriendsManager = ({ userId }: FriendsManagerProps) => {
         .from('profiles')
         .select('id, email')
         .eq('email', searchEmail.trim())
-        .single();
+        .maybeSingle();
 
       if (searchError || !profiles) {
         toast({
