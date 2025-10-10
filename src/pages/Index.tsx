@@ -334,7 +334,9 @@ const Index = () => {
       return acc;
     }, {} as Record<string, GroupedIngredient>);
     
-    return Object.values(grouped);
+    return Object.values(grouped).sort((a, b) => 
+      a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+    );
   };
 
   const handleToggleGroupedIngredient = async (originalIds: string[], checked: boolean) => {
