@@ -213,6 +213,12 @@ const Index = () => {
     toast({ title: t("removedFromFavorites") });
   };
 
+  const handleRemoveFromShared = async (recipeId: string) => {
+    await supabase.from("shared_recipes").delete().eq("shared_with_user_id", session.user.id).eq("recipe_id", recipeId);
+    await loadSharedRecipes();
+    toast({ title: "Retirée des recettes partagées" });
+  };
+
   const handleToggleIngredient = async (id: string, checked: boolean) => {
     await supabase.from("ingredients").update({ checked }).eq("id", id);
     setIngredients(ingredients.map(ing => ing.id === id ? { ...ing, checked } : ing));
@@ -479,7 +485,7 @@ const Index = () => {
                   <p className="text-center text-muted-foreground py-8">Aucune recette partagée</p>
                 ) : (
                   <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
-                    {sharedRecipes.map(recipe => (
+                     {sharedRecipes.map(recipe => (
                       <RecipeCard
                         key={recipe.id}
                         recipe={recipe}
@@ -487,6 +493,8 @@ const Index = () => {
                         onAddToFavorites={handleAddToFavorites}
                         isTodo={todoRecipes.some(r => r.id === recipe.id)}
                         isFavorite={favoriteRecipes.some(r => r.id === recipe.id)}
+                        isShared
+                        onRemoveFromShared={handleRemoveFromShared}
                         onRecipeUpdated={loadSharedRecipes}
                         userId={session.user.id}
                       />

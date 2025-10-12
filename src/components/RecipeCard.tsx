@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, ListTodo, Clock, Users, ChevronDown, ChevronUp } from "lucide-react";
+import { Heart, ListTodo, Clock, Users, ChevronDown, ChevronUp, UserX } from "lucide-react";
 import { EditRecipeDialog } from "@/components/EditRecipeDialog";
 import { RecipeTagSelector } from "@/components/RecipeTagSelector";
 import { RecipeTagDisplay } from "@/components/RecipeTagDisplay";
@@ -30,8 +30,10 @@ interface RecipeCardProps {
   onAddToFavorites: (recipe: Recipe) => void;
   isTodo?: boolean;
   isFavorite?: boolean;
+  isShared?: boolean;
   onRemoveFromTodo?: (recipeId: string) => void;
   onRemoveFromFavorites?: (recipeId: string) => void;
+  onRemoveFromShared?: (recipeId: string) => void;
   onRecipeUpdated?: () => void;
   userId?: string;
   showTags?: boolean;
@@ -43,8 +45,10 @@ export const RecipeCard = ({
   onAddToFavorites,
   isTodo,
   isFavorite,
+  isShared,
   onRemoveFromTodo,
   onRemoveFromFavorites,
+  onRemoveFromShared,
   onRecipeUpdated,
   userId,
   showTags = false,
@@ -191,6 +195,17 @@ export const RecipeCard = ({
           >
             <Heart className="mr-2 h-4 w-4" />
             Ajouter aux favoris
+          </Button>
+        )}
+        {isShared && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onRemoveFromShared?.(recipe.id)}
+            className="w-full justify-start"
+          >
+            <UserX className="mr-2 h-4 w-4" />
+            Retirer des recettes partagées
           </Button>
         )}
       </CardFooter>
