@@ -36,7 +36,7 @@ export function formatQuantity(value: number): string {
 }
 
 export function adjustIngredientQuantity(ingredient: string, ratio: number): string {
-  const [name, quantity, unit] = ingredient.split('|');
+  const [name, quantity, unit] = ingredient.split(';');
   
   if (!quantity) {
     return ingredient;
@@ -50,5 +50,5 @@ export function adjustIngredientQuantity(ingredient: string, ratio: number): str
   const adjustedQuantity = numericQuantity * ratio;
   const formattedQuantity = formatQuantity(adjustedQuantity);
   
-  return [name, formattedQuantity, unit].filter(Boolean).join('|');
+  return [name, formattedQuantity, unit].filter(Boolean).join(';');
 }

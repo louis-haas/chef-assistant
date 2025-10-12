@@ -9,33 +9,27 @@ const corsHeaders = {
 function convertUnits(text: string): string {
   const lines = text.split('\n');
   const convertedLines = lines.map(line => {
-    // Check if line contains ingredient format (name|quantity|unit)
-    if (line.includes('|')) {
-      const parts = line.split('|');
+    // Check if line contains ingredient format (name;quantity;unit)
+    if (line.includes(';')) {
+      const parts = line.split(';');
       if (parts.length === 3) {
         let [name, quantity, unit] = parts;
         const numValue = parseFloat(quantity);
         
         if (!isNaN(numValue)) {
-          // Convert volume units to mL
-          if (unit.trim().toLowerCase() === 'l') {
-            quantity = String(numValue * 1000);
-            unit = 'mL';
-          } else if (unit.trim().toLowerCase() === 'dl') {
-            quantity = String(numValue * 100);
-            unit = 'mL';
-          } else if (unit.trim().toLowerCase() === 'cl') {
-            quantity = String(numValue * 10);
-            unit = 'mL';
+          // Convert mL to g (simple approximation for water-like liquids)
+          if (unit.trim().toLowerCase() === 'ml') {
+            unit = 'g';
           }
-          // Convert weight units to g
-          else if (unit.trim().toLowerCase() === 'kg') {
+          
+          // Convert kg to g
+          if (unit.trim().toLowerCase() === 'kg') {
             quantity = String(numValue * 1000);
             unit = 'g';
           }
         }
         
-        return `${name}|${quantity}|${unit}`;
+        return `${name};${quantity};${unit}`;
       }
     }
     return line;
@@ -100,7 +94,7 @@ serve(async (req) => {
 RÈGLES IMPORTANTES:
 - Extraire le titre de la recette
 - Extraire une courte description (si disponible)
-- Extraire les ingrédients au format "nom|quantité|unité" (un par ligne)
+- Extraire les ingrédients au format "nom;quantité;unité" (un par ligne)
 - NE PAS inclure sel, poivre et eau dans les ingrédients
 - Utiliser des noms GÉNÉRIQUES pour les ingrédients (exemple: "huile d'olive" au lieu de "huile d'olive extra vierge")
 - NE PAS inclure la façon de couper ou préparer dans le nom (pas de "émincé", "en dés")
@@ -110,12 +104,12 @@ RÈGLES IMPORTANTES:
 - Extraire le temps de cuisson (si disponible)
 - Extraire le nombre de portions (si disponible)
 
-Format de réponse EXACT à utiliser (utiliser les pipes | pour séparer):
+Format de réponse EXACT à utiliser (utiliser les point-virgules ; pour séparer):
 TITRE: [titre de la recette]
 DESCRIPTION: [description courte ou "N/A"]
 INGRÉDIENTS:
-[nom|quantité|unité]
-[nom|quantité|unité]
+[nom;quantité;unité]
+[nom;quantité;unité]
 INSTRUCTIONS: [instructions complètes avec deux retours à la ligne entre chaque étape]
 TEMPS_PREP: [temps ou "N/A"]
 TEMPS_CUISSON: [temps ou "N/A"]

@@ -163,7 +163,7 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
 
       // Ajouter les ingrédients
       const ingredientsToAdd = recipe.ingredients.map(ing => {
-        const [name, quantity, unit] = ing.split('|');
+        const [name, quantity, unit] = ing.split(';');
         return { 
           user_id: user.id, 
           recipe_id: insertedRecipe.id, 

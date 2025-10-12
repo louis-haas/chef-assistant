@@ -152,7 +152,7 @@ export const RecipeCard = ({
             <h4 className="font-semibold mb-2">Ingrédients:</h4>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
               {adjustedIngredients.map((ingredient, idx) => {
-                const [name, quantity, unit] = ingredient.split('|');
+                const [name, quantity, unit] = ingredient.split(';');
                 const displayText = quantity 
                   ? unit 
                     ? `${name} - ${quantity} ${unit}`

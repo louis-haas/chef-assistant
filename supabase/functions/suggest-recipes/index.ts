@@ -49,14 +49,14 @@ serve(async (req) => {
 
 RÈGLES IMPORTANTES pour les ingrédients:
 - Un ingrédient par ligne uniquement
-- Format EXACT: "nom_ingrédient|quantité|unité" (exemple: "tomates|200|g", "oignons|2|")
+- Format EXACT: "nom_ingrédient;quantité;unité" (exemple: "tomates;200;g", "oignons;2;")
 - Les unités acceptées: g, mL, cc (cuillère à café), cs (cuillère à soupe), ou vide pour le nombre d'ingrédients
 - NE PAS inclure la façon de couper ou préparer (pas de "émincé", "en dés", "haché")
 - NE PAS inclure la fonction dans la recette (pas de "pour la sauce", "pour la garniture")
 - NE JAMAIS inclure sel, poivre et eau dans la liste
 - Utiliser des noms GÉNÉRIQUES pour les ingrédients (exemple: "huile d'olive" au lieu de "huile d'olive extra vierge", "tomates" au lieu de "tomates cerises")
 - Être précis sur les quantités
-- TOUJOURS utiliser le format avec les pipes |
+- TOUJOURS utiliser le format avec les point-virgules ;
 
 RÈGLES IMPORTANTES pour les instructions:
 - Séparer chaque étape par DEUX retours à la ligne (\\n\\n) pour une meilleure lisibilité

@@ -162,13 +162,13 @@ export const EditRecipeDialog = ({ recipe, onRecipeUpdated }: EditRecipeDialogPr
 
           <div>
             <Label htmlFor="ingredients">
-              Ingrédients (un par ligne au format: nom|quantité|unité)
+              Ingrédients (un par ligne au format: nom;quantité;unité)
             </Label>
             <Textarea
               id="ingredients"
               value={ingredients}
               onChange={(e) => setIngredients(e.target.value)}
-              placeholder="tomates|200|g&#10;oignons|2|&#10;huile d'olive|2|cs"
+              placeholder="tomates;200;g&#10;oignons;2;&#10;huile d'olive;2;cs"
               rows={8}
             />
           </div>

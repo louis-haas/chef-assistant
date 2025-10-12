@@ -169,7 +169,7 @@ const Index = () => {
     try {
       await supabase.from("todo_recipes").insert({ user_id: session.user.id, recipe_id: recipe.id });
       const ingredientsToAdd = recipe.ingredients.map(ing => {
-        const [name, quantity, unit] = ing.split('|');
+        const [name, quantity, unit] = ing.split(';');
         const normalizedName = (name?.trim() || ing).replace(/œu/gi, 'oeu');
         return { 
           user_id: session.user.id, 
