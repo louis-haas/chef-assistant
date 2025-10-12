@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, ListTodo, Clock, Users, ChevronDown, ChevronUp, UserX } from "lucide-react";
+import { Heart, ListTodo, Clock, Users, ChevronDown, ChevronUp, UserX, Minus, Plus } from "lucide-react";
+import { adjustIngredientQuantity } from "@/lib/utils";
 import { EditRecipeDialog } from "@/components/EditRecipeDialog";
 import { RecipeTagSelector } from "@/components/RecipeTagSelector";
 import { RecipeTagDisplay } from "@/components/RecipeTagDisplay";
@@ -54,6 +55,12 @@ export const RecipeCard = ({
   showTags = false,
 }: RecipeCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [servings, setServings] = useState(recipe.servings || 1);
+  
+  const ratio = recipe.servings ? servings / recipe.servings : 1;
+  const adjustedIngredients = recipe.ingredients.map(ing => 
+    adjustIngredientQuantity(ing, ratio)
+  );
 
   return (
     <Card className="h-full flex flex-col">
@@ -106,10 +113,35 @@ export const RecipeCard = ({
               </Badge>
             )}
             {recipe.servings && (
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <Users className="h-3 w-3" />
-                {recipe.servings} personnes
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  <Users className="h-3 w-3" />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-4 w-4 p-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setServings(Math.max(1, servings - 1));
+                    }}
+                  >
+                    <Minus className="h-3 w-3" />
+                  </Button>
+                  <span className="min-w-[3ch] text-center">{servings}</span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-4 w-4 p-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setServings(servings + 1);
+                    }}
+                  >
+                    <Plus className="h-3 w-3" />
+                  </Button>
+                  personnes
+                </Badge>
+              </div>
             )}
           </div>
         </CardHeader>
@@ -119,7 +151,7 @@ export const RecipeCard = ({
           <div>
             <h4 className="font-semibold mb-2">Ingrédients:</h4>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              {recipe.ingredients.map((ingredient, idx) => {
+              {adjustedIngredients.map((ingredient, idx) => {
                 const [name, quantity, unit] = ingredient.split('|');
                 const displayText = quantity 
                   ? unit 
