@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Trash2, ShoppingCart } from "lucide-react";
+import { Trash2, ShoppingCart, Trash } from "lucide-react";
 import { AddIngredientDialog } from "@/components/AddIngredientDialog";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -18,19 +18,33 @@ interface IngredientsListProps {
   onToggle: (id: string, checked: boolean) => void;
   onRemove: (id: string) => void;
   onIngredientAdded?: () => void;
+  onClearAll?: () => void;
 }
 
-export const IngredientsList = ({ ingredients, onToggle, onRemove, onIngredientAdded }: IngredientsListProps) => {
+export const IngredientsList = ({ ingredients, onToggle, onRemove, onIngredientAdded, onClearAll }: IngredientsListProps) => {
   const checkedCount = ingredients.filter(i => i.checked).length;
   const { t } = useLanguage();
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <ShoppingCart className="h-5 w-5" />
-          {t("shoppingList")} ({checkedCount}/{ingredients.length})
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <ShoppingCart className="h-5 w-5" />
+            {t("shoppingList")} ({checkedCount}/{ingredients.length})
+          </CardTitle>
+          {onClearAll && ingredients.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClearAll}
+              className="text-destructive hover:text-destructive"
+            >
+              <Trash className="h-4 w-4 mr-2" />
+              Vider
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="space-y-3">
         {onIngredientAdded && (

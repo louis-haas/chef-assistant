@@ -366,6 +366,12 @@ const Index = () => {
     await loadIngredients();
   };
 
+  const handleClearAllIngredients = async () => {
+    await supabase.from("ingredients").delete().eq("user_id", session.user.id);
+    await loadIngredients();
+    toast({ title: "Liste d'ingrédients vidée" });
+  };
+
   const groupedIngredients = groupIngredients(ingredients);
 
   const getFilteredFavorites = async () => {
@@ -517,6 +523,7 @@ const Index = () => {
                 if (ingredient) handleRemoveGroupedIngredient(ingredient.originalIds);
               }}
               onIngredientAdded={loadIngredients}
+              onClearAll={handleClearAllIngredients}
             />
           </div>
         </div>
