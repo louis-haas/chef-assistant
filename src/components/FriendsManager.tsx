@@ -146,19 +146,69 @@ export const FriendsManager = ({ userId }: FriendsManagerProps) => {
   };
 
   const respondToRequest = async (friendshipId: string, accept: boolean) => {
-    const { error } = await supabase
-      .from('friends')
-      .update({ status: accept ? 'accepted' : 'rejected' })
-      .eq('id', friendshipId);
+    if (accept) {
+      // Get the original request details
+      const { data: request, error: fetchError } = await supabase
+        .from('friends')
+        .select('user_id, friend_id')
+        .eq('id', friendshipId)
+        .single();
 
-    if (error) {
-      console.error('Error responding to request:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de répondre à la demande",
-        variant: "destructive",
-      });
-      return;
+      if (fetchError || !request) {
+        console.error('Error fetching request:', fetchError);
+        toast({
+          title: "Erreur",
+          description: "Impossible de récupérer la demande",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Update the original request
+      const { error: updateError } = await supabase
+        .from('friends')
+        .update({ status: 'accepted' })
+        .eq('id', friendshipId);
+
+      if (updateError) {
+        console.error('Error updating request:', updateError);
+        toast({
+          title: "Erreur",
+          description: "Impossible d'accepter la demande",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create the reciprocal friendship
+      const { error: insertError } = await supabase
+        .from('friends')
+        .insert({
+          user_id: request.friend_id,
+          friend_id: request.user_id,
+          status: 'accepted'
+        });
+
+      if (insertError) {
+        console.error('Error creating reciprocal friendship:', insertError);
+        // The main friendship was created, so we don't show an error to the user
+      }
+    } else {
+      // Just reject the request
+      const { error } = await supabase
+        .from('friends')
+        .update({ status: 'rejected' })
+        .eq('id', friendshipId);
+
+      if (error) {
+        console.error('Error rejecting request:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de refuser la demande",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     toast({
