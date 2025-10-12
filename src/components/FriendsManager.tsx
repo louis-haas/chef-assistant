@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserPlus, Check, X, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { z } from "zod";
 
 interface Profile {
   id: string;
@@ -76,15 +77,25 @@ export const FriendsManager = ({ userId }: FriendsManagerProps) => {
   };
 
   const sendFriendRequest = async () => {
-    if (!searchEmail.trim()) return;
+    // Validate email format
+    const emailSchema = z.string().trim().email().max(255);
+    
+    try {
+      emailSchema.parse(searchEmail);
+    } catch (error) {
+      toast({
+        title: "Email invalide",
+        description: "Veuillez entrer une adresse email valide",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setLoading(true);
     try {
-      // Find user by email
+      // Use secure search function instead of direct table access
       const { data: profiles, error: searchError } = await supabase
-        .from('profiles')
-        .select('id, email')
-        .eq('email', searchEmail.trim())
+        .rpc("search_user_by_email", { _email: searchEmail.trim() })
         .maybeSingle();
 
       if (searchError || !profiles) {

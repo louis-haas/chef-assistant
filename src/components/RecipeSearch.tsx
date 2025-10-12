@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Search } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { z } from "zod";
+import { toast } from "sonner";
 
 interface RecipeSearchProps {
   onSearch: (prompt: string) => void;
@@ -16,8 +18,17 @@ export const RecipeSearch = ({ onSearch, isLoading }: RecipeSearchProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (prompt.trim()) {
-      onSearch(prompt);
+    
+    // Validate search prompt
+    const promptSchema = z.string().trim().min(3, "La recherche doit contenir au moins 3 caractères").max(500, "La recherche est trop longue (max 500 caractères)");
+    
+    try {
+      const validatedPrompt = promptSchema.parse(prompt);
+      onSearch(validatedPrompt);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast.error(error.errors[0].message);
+      }
     }
   };
 

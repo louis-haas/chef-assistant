@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { z } from "zod";
 
 interface Recipe {
   id: string;
@@ -36,9 +37,26 @@ export const EditRecipeDialog = ({ recipe, onRecipeUpdated }: EditRecipeDialogPr
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
-    if (!title.trim()) {
-      toast.error("Le titre est requis");
-      return;
+    // Validation schemas
+    const recipeSchema = z.object({
+      title: z.string().trim().min(1, "Le titre est requis").max(200, "Le titre est trop long (max 200 caractères)"),
+      description: z.string().max(500, "La description est trop longue (max 500 caractères)"),
+      instructions: z.string().trim().min(1, "Les instructions sont requises").max(5000, "Les instructions sont trop longues (max 5000 caractères)"),
+      ingredients: z.string().trim().min(1, "Au moins un ingrédient est requis")
+    });
+
+    try {
+      recipeSchema.parse({
+        title,
+        description,
+        instructions,
+        ingredients
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast.error(error.errors[0].message);
+        return;
+      }
     }
 
     setIsSaving(true);

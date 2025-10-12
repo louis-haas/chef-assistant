@@ -314,7 +314,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      search_user_by_email: {
+        Args: { _email: string }
+        Returns: {
+          display_name: string
+          email: string
+          id: string
+        }[]
+      }
     }
     Enums: {
       friendship_status: "pending" | "accepted" | "rejected"

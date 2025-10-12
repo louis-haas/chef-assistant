@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Upload, Link } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { z } from "zod";
 
 interface ImportRecipeDialogProps {
   onRecipeImported: () => void;
@@ -70,14 +71,30 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
   const handleImport = async () => {
     const isUrlMode = activeTab === "url";
     
-    if (isUrlMode && !recipeUrl.trim()) {
-      toast.error("Veuillez entrer une URL");
-      return;
-    }
+    // Validation schemas
+    const urlSchema = z.string().trim().url().max(2048);
+    const textSchema = z.string().trim().min(10).max(10000);
     
-    if (!isUrlMode && !recipeText.trim()) {
-      toast.error("Veuillez coller le texte d'une recette");
-      return;
+    try {
+      if (isUrlMode) {
+        urlSchema.parse(recipeUrl);
+      } else {
+        textSchema.parse(recipeText);
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const message = error.errors[0].message;
+        if (message.includes("url")) {
+          toast.error("Veuillez entrer une URL valide");
+        } else if (message.includes("min")) {
+          toast.error("Le texte de la recette est trop court (minimum 10 caractères)");
+        } else if (message.includes("max")) {
+          toast.error("Le texte de la recette est trop long (maximum 10000 caractères)");
+        } else {
+          toast.error("Format invalide");
+        }
+        return;
+      }
     }
 
     setIsImporting(true);
