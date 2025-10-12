@@ -58,9 +58,10 @@ export const RecipeCard = ({
   const [servings, setServings] = useState(recipe.servings || 1);
   
   const ratio = recipe.servings ? servings / recipe.servings : 1;
-  const adjustedIngredients = recipe.ingredients.map(ing => 
-    adjustIngredientQuantity(ing, ratio)
-  );
+  // Convert old format (|) to new format (;) before adjusting quantities
+  const adjustedIngredients = recipe.ingredients
+    .map(ing => ing.replace(/\|/g, ';'))
+    .map(ing => adjustIngredientQuantity(ing, ratio));
 
   return (
     <Card className="h-full flex flex-col">

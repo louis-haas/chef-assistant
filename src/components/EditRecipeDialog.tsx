@@ -29,7 +29,10 @@ export const EditRecipeDialog = ({ recipe, onRecipeUpdated }: EditRecipeDialogPr
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState(recipe.title);
   const [description, setDescription] = useState(recipe.description || "");
-  const [ingredients, setIngredients] = useState(recipe.ingredients.join('\n'));
+  // Convert old format (|) to new format (;) for display
+  const [ingredients, setIngredients] = useState(
+    recipe.ingredients.map(ing => ing.replace(/\|/g, ';')).join('\n')
+  );
   const [instructions, setInstructions] = useState(recipe.instructions);
   const [prepTime, setPrepTime] = useState(recipe.prep_time || "");
   const [cookTime, setCookTime] = useState(recipe.cook_time || "");
