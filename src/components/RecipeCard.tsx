@@ -8,6 +8,7 @@ import { EditRecipeDialog } from "@/components/EditRecipeDialog";
 import { RecipeTagSelector } from "@/components/RecipeTagSelector";
 import { RecipeTagDisplay } from "@/components/RecipeTagDisplay";
 import { ShareRecipeDialog } from "@/components/ShareRecipeDialog";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Collapsible,
   CollapsibleContent,
@@ -56,6 +57,7 @@ export const RecipeCard = ({
 }: RecipeCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [servings, setServings] = useState(recipe.servings || 1);
+  const { t } = useLanguage();
   
   const ratio = recipe.servings ? servings / recipe.servings : 1;
   // Convert old format (|) to new format (;) before adjusting quantities
@@ -104,13 +106,13 @@ export const RecipeCard = ({
             {recipe.prep_time && (
               <Badge variant="secondary" className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />
-                Préparation: {recipe.prep_time}
+                {t("preparation")}: {recipe.prep_time}
               </Badge>
             )}
             {recipe.cook_time && (
               <Badge variant="secondary" className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />
-                Cuisson: {recipe.cook_time}
+                {t("cooking")}: {recipe.cook_time}
               </Badge>
             )}
             {recipe.servings && (
@@ -140,7 +142,7 @@ export const RecipeCard = ({
                   >
                     <Plus className="h-3 w-3" />
                   </Button>
-                  personnes
+                  {t("servings")}
                 </Badge>
               </div>
             )}
@@ -150,7 +152,7 @@ export const RecipeCard = ({
           <CardContent className="flex-1">
         <div className="space-y-4">
           <div>
-            <h4 className="font-semibold mb-2">Ingrédients:</h4>
+            <h4 className="font-semibold mb-2">{t("ingredients")}:</h4>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
               {adjustedIngredients.map((ingredient, idx) => {
                 const [name, quantity, unit] = ingredient.split(';');
@@ -164,7 +166,7 @@ export const RecipeCard = ({
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-2">Instructions:</h4>
+            <h4 className="font-semibold mb-2">{t("instructions")}:</h4>
             <p className="text-sm text-muted-foreground whitespace-pre-line">
               {recipe.instructions}
             </p>
@@ -196,7 +198,7 @@ export const RecipeCard = ({
             className="w-full justify-start"
           >
             <ListTodo className="mr-2 h-4 w-4" />
-            Retirer de la to-do
+            {t("removeFromTodo")}
           </Button>
         ) : (
           <Button
@@ -206,7 +208,7 @@ export const RecipeCard = ({
             className="w-full justify-start"
           >
             <ListTodo className="mr-2 h-4 w-4" />
-            Ajouter à la to-do
+            {t("addToTodo")}
           </Button>
         )}
         {isFavorite ? (
@@ -217,7 +219,7 @@ export const RecipeCard = ({
             className="w-full justify-start"
           >
             <Heart className="mr-2 h-4 w-4 fill-current" />
-            Retirer des favoris
+            {t("removeFromFavorites")}
           </Button>
         ) : (
           <Button
@@ -227,7 +229,7 @@ export const RecipeCard = ({
             className="w-full justify-start"
           >
             <Heart className="mr-2 h-4 w-4" />
-            Ajouter aux favoris
+            {t("addToFavorites")}
           </Button>
         )}
         {isShared && (
@@ -238,7 +240,7 @@ export const RecipeCard = ({
             className="w-full justify-start"
           >
             <UserX className="mr-2 h-4 w-4" />
-            Retirer des recettes partagées
+            {t("removeFromShared")}
           </Button>
         )}
       </CardFooter>

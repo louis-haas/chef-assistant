@@ -12,6 +12,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Profile {
   id: string;
@@ -35,6 +36,7 @@ export const ShareRecipeDialog = ({ recipeId, userId }: ShareRecipeDialogProps) 
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (open) {
@@ -119,16 +121,16 @@ export const ShareRecipeDialog = ({ recipeId, userId }: ShareRecipeDialogProps) 
       }
 
       toast({
-        title: "Recette partagée",
-        description: "La recette a été partagée avec vos amis",
+        title: t("recipeShared"),
+        description: t("recipeSharedSuccess"),
       });
 
       setOpen(false);
     } catch (error) {
       console.error('Error sharing recipe:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de partager la recette",
+        title: t("error"),
+        description: t("unableToShare"),
         variant: "destructive",
       });
     } finally {
@@ -149,21 +151,21 @@ export const ShareRecipeDialog = ({ recipeId, userId }: ShareRecipeDialogProps) 
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Share2 className="h-4 w-4 mr-2" />
-          Partager
+          {t("shareRecipe")}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Partager la recette</DialogTitle>
+          <DialogTitle>{t("shareRecipeTitle")}</DialogTitle>
           <DialogDescription>
-            Sélectionnez les amis avec qui vous souhaitez partager cette recette
+            {t("shareRecipeDescription")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-3 max-h-[400px] overflow-y-auto">
           {friends.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
-              Vous n'avez pas encore d'amis. Ajoutez des amis pour partager des recettes !
+              {t("noFriendsYet")}
             </p>
           ) : (
             friends.map((friend) => (
@@ -191,10 +193,10 @@ export const ShareRecipeDialog = ({ recipeId, userId }: ShareRecipeDialogProps) 
 
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => setOpen(false)}>
-            Annuler
+            {t("cancel")}
           </Button>
           <Button onClick={handleShare} disabled={loading || friends.length === 0}>
-            {loading ? "Partage..." : "Partager"}
+            {loading ? t("sharing") : t("shareRecipe")}
           </Button>
         </div>
       </DialogContent>

@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserPlus, Check, X, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { z } from "zod";
 
 interface Profile {
@@ -34,6 +35,7 @@ export const FriendsManager = ({ userId }: FriendsManagerProps) => {
   const [pendingRequests, setPendingRequests] = useState<Friendship[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     loadFriends();
@@ -110,8 +112,8 @@ export const FriendsManager = ({ userId }: FriendsManagerProps) => {
 
       if (profiles.id === userId) {
         toast({
-          title: "Erreur",
-          description: "Vous ne pouvez pas vous ajouter vous-même",
+          title: t("error"),
+          description: t("cannotAddYourself"),
           variant: "destructive",
         });
         setLoading(false);
@@ -223,8 +225,8 @@ export const FriendsManager = ({ userId }: FriendsManagerProps) => {
     }
 
     toast({
-      title: accept ? "Ami ajouté" : "Demande refusée",
-      description: accept ? "Vous êtes maintenant amis" : "La demande a été refusée",
+      title: accept ? t("friendAdded") : t("requestDeclined"),
+      description: accept ? t("nowFriends") : t("requestDeclinedMessage"),
     });
 
     loadPendingRequests();
@@ -240,8 +242,8 @@ export const FriendsManager = ({ userId }: FriendsManagerProps) => {
     if (error) {
       console.error('Error removing friend:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de retirer cet ami",
+        title: t("error"),
+        description: t("unableToRemoveFriend"),
         variant: "destructive",
       });
       return;
@@ -260,20 +262,20 @@ export const FriendsManager = ({ userId }: FriendsManagerProps) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Users className="h-5 w-5" />
-          Amis
+          {t("friends")}
         </CardTitle>
         <CardDescription>
-          Gérez vos amis et partagez des recettes avec eux
+          {t("friendsDescription")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="friends" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="friends">
-              Mes amis ({friends.length})
+              {t("myFriends")} ({friends.length})
             </TabsTrigger>
             <TabsTrigger value="requests">
-              Demandes ({pendingRequests.length})
+              {t("requests")} ({pendingRequests.length})
             </TabsTrigger>
           </TabsList>
 

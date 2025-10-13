@@ -218,7 +218,7 @@ const Index = () => {
   const handleRemoveFromShared = async (recipeId: string) => {
     await supabase.from("shared_recipes").delete().eq("shared_with_user_id", session.user.id).eq("recipe_id", recipeId);
     await loadSharedRecipes();
-    toast({ title: "Retirée des recettes partagées" });
+    toast({ title: t("removedFromShared") });
   };
 
   const handleToggleIngredient = async (id: string, checked: boolean) => {
@@ -371,7 +371,7 @@ const Index = () => {
   const handleClearAllIngredients = async () => {
     await supabase.from("ingredients").delete().eq("user_id", session.user.id);
     await loadIngredients();
-    toast({ title: "Liste d'ingrédients vidée" });
+    toast({ title: t("ingredientListCleared") });
   };
 
   const groupedIngredients = groupIngredients(ingredients);
@@ -435,7 +435,7 @@ const Index = () => {
                 <TabsTrigger value="suggestions" className="text-xs sm:text-sm">{t("suggestions")}</TabsTrigger>
                 <TabsTrigger value="todo" className="text-xs sm:text-sm">{t("todo")} ({todoRecipes.length})</TabsTrigger>
                 <TabsTrigger value="favorites" className="text-xs sm:text-sm">{t("favorites")} ({favoriteRecipes.length})</TabsTrigger>
-                <TabsTrigger value="shared" className="text-xs sm:text-sm">Partagées ({sharedRecipes.length})</TabsTrigger>
+                <TabsTrigger value="shared" className="text-xs sm:text-sm">{t("shared")} ({sharedRecipes.length})</TabsTrigger>
               </TabsList>
               <TabsContent value="suggestions" className="space-y-4">
                 {suggestedRecipes.length === 0 ? <p className="text-center text-muted-foreground py-8">{t("searchRecipes")}</p> : <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">{suggestedRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} onAddToTodo={handleAddToTodo} onAddToFavorites={handleAddToFavorites} isTodo={todoRecipes.some(r => r.id === recipe.id)} isFavorite={favoriteRecipes.some(r => r.id === recipe.id)} onRecipeUpdated={fetchUserRecipes} />)}</div>}
