@@ -309,7 +309,7 @@ export const FriendsManager = ({ userId }: FriendsManagerProps) => {
                   >
                     <div>
                       <p className="font-medium">
-                        {friendship.friend_profile?.display_name || 'Utilisateur'}
+                        {friendship.friend_profile?.display_name || friendship.friend_profile?.email}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         {friendship.friend_profile?.email}
@@ -341,7 +341,7 @@ export const FriendsManager = ({ userId }: FriendsManagerProps) => {
                 >
                   <div>
                     <p className="font-medium">
-                      {request.user_profile?.display_name || 'Utilisateur'}
+                      {request.user_profile?.display_name || request.user_profile?.email}
                     </p>
                     <p className="text-sm text-muted-foreground">
                       {request.user_profile?.email}
