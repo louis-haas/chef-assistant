@@ -139,6 +139,9 @@ export const translations = {
     requestDeclinedMessage: "La demande a été refusée",
     cannotAddYourself: "Vous ne pouvez pas vous ajouter vous-même",
     unableToRemoveFriend: "Impossible de retirer cet ami",
+    removeFriendConfirmTitle: "Retirer cet ami ?",
+    removeFriendConfirmDescription: "Êtes-vous sûr de vouloir retirer cet ami de votre liste ? Cette action est irréversible.",
+    confirmRemove: "Retirer",
   },
   en: {
     // Header
@@ -280,6 +283,9 @@ export const translations = {
     requestDeclinedMessage: "The request has been declined",
     cannotAddYourself: "You cannot add yourself",
     unableToRemoveFriend: "Unable to remove this friend",
+    removeFriendConfirmTitle: "Remove this friend?",
+    removeFriendConfirmDescription: "Are you sure you want to remove this friend from your list? This action cannot be undone.",
+    confirmRemove: "Remove",
   }
 };
 
