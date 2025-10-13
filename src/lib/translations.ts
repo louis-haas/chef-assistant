@@ -4,6 +4,25 @@ export const translations = {
     appName: "Oui, Chef!",
     logout: "Déconnexion",
     
+    // Auth
+    username: "Nom d'utilisateur",
+    usernamePlaceholder: "Votre nom d'utilisateur",
+    signIn: "Connexion",
+    signUp: "Inscription",
+    signUpButton: "S'inscrire",
+    signInButton: "Se connecter",
+    signingIn: "Connexion...",
+    signingUp: "Inscription...",
+    signUpSuccess: "Inscription réussie!",
+    signUpSuccessMessage: "Vous pouvez maintenant vous connecter.",
+    signInSuccess: "Connexion réussie!",
+    signInSuccessMessage: "Bienvenue dans votre assistant culinaire.",
+    email: "Email",
+    password: "Mot de passe",
+    emailPlaceholder: "votre@email.com",
+    culinaryAssistant: "Assistant Culinaire",
+    discoverRecipes: "Découvrez de délicieuses recettes avec l'aide de l'IA",
+    
     // Tabs
     suggestions: "Suggestions",
     todo: "To-Do",
@@ -125,6 +144,25 @@ export const translations = {
     // Header
     appName: "Oui, Chef!",
     logout: "Logout",
+    
+    // Auth
+    username: "Username",
+    usernamePlaceholder: "Your username",
+    signIn: "Sign In",
+    signUp: "Sign Up",
+    signUpButton: "Sign up",
+    signInButton: "Sign in",
+    signingIn: "Signing in...",
+    signingUp: "Signing up...",
+    signUpSuccess: "Sign up successful!",
+    signUpSuccessMessage: "You can now sign in.",
+    signInSuccess: "Sign in successful!",
+    signInSuccessMessage: "Welcome to your culinary assistant.",
+    email: "Email",
+    password: "Password",
+    emailPlaceholder: "your@email.com",
+    culinaryAssistant: "Culinary Assistant",
+    discoverRecipes: "Discover delicious recipes with AI assistance",
     
     // Tabs
     suggestions: "Suggestions",
