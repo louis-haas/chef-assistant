@@ -99,7 +99,7 @@ RÈGLES IMPORTANTES:
 - Utiliser des noms GÉNÉRIQUES pour les ingrédients (exemple: "huile d'olive" au lieu de "huile d'olive extra vierge")
 - NE PAS inclure la façon de couper ou préparer dans le nom (pas de "émincé", "en dés")
 - Unités acceptées: g, mL, cc (cuillère à café), cs (cuillère à soupe), ou vide
-- Extraire les instructions étape par étape
+- Extraire les instructions étape par étape avec des numéros
 - Extraire le temps de préparation (si disponible)
 - Extraire le temps de cuisson (si disponible)
 - Extraire le nombre de portions (si disponible)
@@ -110,12 +110,20 @@ DESCRIPTION: [description courte ou "N/A"]
 INGRÉDIENTS:
 [nom;quantité;unité]
 [nom;quantité;unité]
-INSTRUCTIONS: [instructions complètes avec deux retours à la ligne entre chaque étape]
+INSTRUCTIONS:
+1. [première étape]
+
+2. [deuxième étape]
+
+3. [troisième étape]
 TEMPS_PREP: [temps ou "N/A"]
 TEMPS_CUISSON: [temps ou "N/A"]
 PORTIONS: [nombre ou "N/A"]
 
-IMPORTANT: Dans les INSTRUCTIONS, séparer chaque étape par deux retours à la ligne pour une meilleure lisibilité.`;
+CRUCIAL: Chaque étape des INSTRUCTIONS DOIT commencer par son numéro suivi d'un point, et DOIT être séparée de la suivante par une ligne vide. Exemple:
+1. Préchauffer le four
+
+2. Mélanger les ingrédients`;
 
     // Construire le message utilisateur en fonction du type d'entrée
     let userMessage;
