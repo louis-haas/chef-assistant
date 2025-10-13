@@ -59,10 +59,22 @@ export const translations = {
     
     // Import Recipe
     importRecipe: "Importer une recette",
+    importShort: "Importer",
     importDescription: "Collez le texte d'une recette (titre, ingrédients, instructions) et l'IA l'analysera automatiquement.",
+    importRecipeDescriptionFull: "Importez une recette via texte ou URL et l'IA l'analysera automatiquement.",
     pasteRecipe: "Collez ici le texte complet de votre recette...",
     importing: "Import en cours...",
     importButton: "Importer la recette",
+    importFromUrl: "Importer depuis l'URL",
+    textTab: "Texte",
+    urlPlaceholder: "https://example.com/ma-recette",
+    urlDescription: "L'application va scraper la page et extraire la recette automatiquement.",
+    invalidUrl: "Veuillez entrer une URL valide",
+    recipeTooShort: "Le texte de la recette est trop court (minimum 10 caractères)",
+    recipeTooLong: "Le texte de la recette est trop long (maximum 10000 caractères)",
+    invalidFormat: "Format invalide",
+    importError: "Erreur lors de l'import de la recette",
+    aiServiceMaintenance: "Le service AI est en maintenance, veuillez réessayer dans quelques minutes.",
     
     // Add Item Dialog
     addItemTitle: "Ajouter un item",
@@ -203,10 +215,22 @@ export const translations = {
     
     // Import Recipe
     importRecipe: "Import recipe",
+    importShort: "Import",
     importDescription: "Paste a recipe text (title, ingredients, instructions) and the AI will analyze it automatically.",
+    importRecipeDescriptionFull: "Import a recipe via text or URL and the AI will analyze it automatically.",
     pasteRecipe: "Paste your complete recipe text here...",
     importing: "Importing...",
     importButton: "Import recipe",
+    importFromUrl: "Import from URL",
+    textTab: "Text",
+    urlPlaceholder: "https://example.com/my-recipe",
+    urlDescription: "The app will scrape the page and extract the recipe automatically.",
+    invalidUrl: "Please enter a valid URL",
+    recipeTooShort: "Recipe text is too short (minimum 10 characters)",
+    recipeTooLong: "Recipe text is too long (maximum 10000 characters)",
+    invalidFormat: "Invalid format",
+    importError: "Error importing recipe",
+    aiServiceMaintenance: "The AI service is under maintenance, please try again in a few minutes.",
     
     // Add Item Dialog
     addItemTitle: "Add item",

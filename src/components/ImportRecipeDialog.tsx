@@ -8,12 +8,14 @@ import { Upload, Link } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ImportRecipeDialogProps {
   onRecipeImported: () => void;
 }
 
 export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps) => {
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [recipeText, setRecipeText] = useState("");
   const [recipeUrl, setRecipeUrl] = useState("");
@@ -85,13 +87,13 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
       if (error instanceof z.ZodError) {
         const message = error.errors[0].message;
         if (message.includes("url")) {
-          toast.error("Veuillez entrer une URL valide");
+          toast.error(t("invalidUrl"));
         } else if (message.includes("min")) {
-          toast.error("Le texte de la recette est trop court (minimum 10 caractères)");
+          toast.error(t("recipeTooShort"));
         } else if (message.includes("max")) {
-          toast.error("Le texte de la recette est trop long (maximum 10000 caractères)");
+          toast.error(t("recipeTooLong"));
         } else {
-          toast.error("Format invalide");
+          toast.error(t("invalidFormat"));
         }
         return;
       }
@@ -102,7 +104,7 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        toast.error("Vous devez être connecté pour importer une recette");
+        toast.error(t("mustBeLoggedIn"));
         return;
       }
 
@@ -118,7 +120,7 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
       });
 
       if (functionError) {
-        let errorMessage = "Erreur lors de l'import de la recette";
+        let errorMessage = t("importError");
         
         // Handle specific error messages
         if (functionData?.error) {
@@ -128,8 +130,8 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
         }
         
         // Add helpful message for 503 errors
-        if (errorMessage.includes('temporairement indisponible')) {
-          errorMessage += " Le service AI est en maintenance, veuillez réessayer dans quelques minutes.";
+        if (errorMessage.includes('temporairement indisponible') || errorMessage.includes('temporarily unavailable')) {
+          errorMessage += " " + t("aiServiceMaintenance");
         }
         
         toast.error(errorMessage);
@@ -177,14 +179,14 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
       });
       await supabase.from("ingredients").insert(ingredientsToAdd);
 
-      toast.success("Recette importée et ajoutée à votre to-do!");
+      toast.success(t("recipeImported"));
       setRecipeText("");
       setRecipeUrl("");
       setOpen(false);
       onRecipeImported();
     } catch (error) {
       console.error('Error importing recipe:', error);
-      toast.error("Erreur lors de l'import de la recette");
+      toast.error(t("importError"));
     } finally {
       setIsImporting(false);
     }
@@ -195,25 +197,25 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="gap-1 sm:gap-2">
           <Upload className="h-4 w-4" />
-          <span className="hidden sm:inline">Importer une recette</span>
-          <span className="sm:hidden">Importer</span>
+          <span className="hidden sm:inline">{t("importRecipe")}</span>
+          <span className="sm:hidden">{t("importShort")}</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl mx-2 sm:mx-auto">
         <DialogHeader>
-          <DialogTitle>Importer une recette</DialogTitle>
+          <DialogTitle>{t("importRecipe")}</DialogTitle>
           <DialogDescription>
-            Importez une recette via texte ou URL et l'IA l'analysera automatiquement.
+            {t("importRecipeDescriptionFull")}
           </DialogDescription>
         </DialogHeader>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="text">Texte</TabsTrigger>
+            <TabsTrigger value="text">{t("textTab")}</TabsTrigger>
             <TabsTrigger value="url">URL</TabsTrigger>
           </TabsList>
           <TabsContent value="text" className="space-y-4">
             <Textarea
-              placeholder="Collez ici le texte complet de votre recette..."
+              placeholder={t("pasteRecipe")}
               value={recipeText}
               onChange={(e) => setRecipeText(e.target.value)}
               className="min-h-[300px]"
@@ -223,20 +225,20 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
               disabled={isImporting || !recipeText.trim()}
               className="w-full"
             >
-              {isImporting ? "Import en cours..." : "Importer la recette"}
+              {isImporting ? t("importing") : t("importButton")}
             </Button>
           </TabsContent>
           <TabsContent value="url" className="space-y-4">
             <div className="space-y-2">
               <Input
                 type="url"
-                placeholder="https://example.com/ma-recette"
+                placeholder={t("urlPlaceholder")}
                 value={recipeUrl}
                 onChange={(e) => setRecipeUrl(e.target.value)}
                 className="w-full"
               />
               <p className="text-sm text-muted-foreground">
-                L'application va scraper la page et extraire la recette automatiquement.
+                {t("urlDescription")}
               </p>
             </div>
             <Button 
@@ -244,7 +246,7 @@ export const ImportRecipeDialog = ({ onRecipeImported }: ImportRecipeDialogProps
               disabled={isImporting || !recipeUrl.trim()}
               className="w-full"
             >
-              {isImporting ? "Import en cours..." : "Importer depuis l'URL"}
+              {isImporting ? t("importing") : t("importFromUrl")}
             </Button>
           </TabsContent>
         </Tabs>
