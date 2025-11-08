@@ -231,6 +231,35 @@ const Index = () => {
     await loadIngredients();
   };
 
+  const handleServingsChange = async (recipeId: string, newServings: number) => {
+    // Find the recipe to get original servings
+    const recipe = todoRecipes.find(r => r.id === recipeId);
+    if (!recipe || !recipe.servings) return;
+
+    const ratio = newServings / recipe.servings;
+
+    // Get all ingredients for this recipe
+    const recipeIngredients = ingredients.filter(ing => ing.recipe_id === recipeId);
+
+    // Update each ingredient with adjusted quantity
+    for (const ingredient of recipeIngredients) {
+      if (ingredient.quantity) {
+        const numericQuantity = parseQuantity(ingredient.quantity)?.value;
+        if (numericQuantity) {
+          const adjustedQuantity = numericQuantity * ratio;
+          const formattedQuantity = adjustedQuantity.toFixed(3).replace(/\.?0+$/, '');
+          
+          await supabase
+            .from("ingredients")
+            .update({ quantity: formattedQuantity })
+            .eq("id", ingredient.id);
+        }
+      }
+    }
+
+    await loadIngredients();
+  };
+
   const parseQuantity = (quantity: string): { value: number; unit: string } | null => {
     if (!quantity) return null;
     
@@ -441,7 +470,7 @@ const Index = () => {
                 {suggestedRecipes.length === 0 ? <p className="text-center text-muted-foreground py-8">{t("searchRecipes")}</p> : <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">{suggestedRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} onAddToTodo={handleAddToTodo} onAddToFavorites={handleAddToFavorites} isTodo={todoRecipes.some(r => r.id === recipe.id)} isFavorite={favoriteRecipes.some(r => r.id === recipe.id)} onRecipeUpdated={fetchUserRecipes} />)}</div>}
               </TabsContent>
               <TabsContent value="todo" className="space-y-4">
-                {todoRecipes.length === 0 ? <p className="text-center text-muted-foreground py-8">{t("noTodoRecipes")}</p> : <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">{todoRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} onAddToTodo={handleAddToTodo} onAddToFavorites={handleAddToFavorites} isTodo isFavorite={favoriteRecipes.some(r => r.id === recipe.id)} onRemoveFromTodo={handleRemoveFromTodo} onRecipeUpdated={fetchUserRecipes} />)}</div>}
+                {todoRecipes.length === 0 ? <p className="text-center text-muted-foreground py-8">{t("noTodoRecipes")}</p> : <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">{todoRecipes.map(recipe => <RecipeCard key={recipe.id} recipe={recipe} onAddToTodo={handleAddToTodo} onAddToFavorites={handleAddToFavorites} isTodo isFavorite={favoriteRecipes.some(r => r.id === recipe.id)} onRemoveFromTodo={handleRemoveFromTodo} onRecipeUpdated={fetchUserRecipes} onServingsChange={handleServingsChange} />)}</div>}
               </TabsContent>
               <TabsContent value="favorites" className="space-y-4">
                 {favoriteRecipes.length === 0 ? (

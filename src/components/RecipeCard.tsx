@@ -39,6 +39,7 @@ interface RecipeCardProps {
   onRecipeUpdated?: () => void;
   userId?: string;
   showTags?: boolean;
+  onServingsChange?: (recipeId: string, newServings: number) => void;
 }
 
 export const RecipeCard = ({
@@ -54,10 +55,18 @@ export const RecipeCard = ({
   onRecipeUpdated,
   userId,
   showTags = false,
+  onServingsChange,
 }: RecipeCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [servings, setServings] = useState(recipe.servings || 1);
   const { t } = useLanguage();
+
+  const handleServingsChange = (newServings: number) => {
+    setServings(newServings);
+    if (isTodo && onServingsChange) {
+      onServingsChange(recipe.id, newServings);
+    }
+  };
   
   const ratio = recipe.servings ? servings / recipe.servings : 1;
   // Convert old format (|) to new format (;) before adjusting quantities
@@ -125,7 +134,7 @@ export const RecipeCard = ({
                     className="h-4 w-4 p-0"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setServings(Math.max(1, servings - 1));
+                      handleServingsChange(Math.max(1, servings - 1));
                     }}
                   >
                     <Minus className="h-3 w-3" />
@@ -137,7 +146,7 @@ export const RecipeCard = ({
                     className="h-4 w-4 p-0"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setServings(servings + 1);
+                      handleServingsChange(servings + 1);
                     }}
                   >
                     <Plus className="h-3 w-3" />
