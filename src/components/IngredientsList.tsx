@@ -24,6 +24,12 @@ interface IngredientsListProps {
 export const IngredientsList = ({ ingredients, onToggle, onRemove, onIngredientAdded, onClearAll }: IngredientsListProps) => {
   const checkedCount = ingredients.filter(i => i.checked).length;
   const { t } = useLanguage();
+  
+  // Sort ingredients: unchecked first, then checked
+  const sortedIngredients = [...ingredients].sort((a, b) => {
+    if (a.checked === b.checked) return 0;
+    return a.checked ? 1 : -1;
+  });
 
   return (
     <Card>
@@ -56,7 +62,7 @@ export const IngredientsList = ({ ingredients, onToggle, onRemove, onIngredientA
           </p>
         ) : (
           <ul className="space-y-2">
-          {ingredients.map((ingredient) => (
+          {sortedIngredients.map((ingredient) => (
             <li
               key={ingredient.id}
               className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-muted"
